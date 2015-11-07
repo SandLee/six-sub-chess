@@ -28,8 +28,6 @@ public:
 		cocos2d::Vec2 target;
 	};
 
-	typedef std::function<void()> EventUpate;
-
 	static const int kCheckerboardRowNum = 4;		// 棋盘行数
 	static const int kCheckerboardColNum = 4;		// 棋盘列数
 
@@ -41,9 +39,14 @@ public:
 	void init_checkerboard();
 
 	/**
+	 * 浏览棋盘
+	 */
+	void visit_checkerboard(const std::function<void(const cocos2d::Vec2 &, int value)> &func);
+
+	/**
 	 * 添加事件更新通知
 	 */
-	void add_event_update_notice(EventUpate &&func);
+	void add_event_update_notice(std::function<void()> &&func);
 
 	/**
 	 * 取出事件信息
@@ -77,7 +80,7 @@ public:
 
 private:
 	unsigned int												hander_num_;
-	EventUpate													even_update_;
+	std::function<void()>										even_update_;
 	std::queue<EventDetails>									event_queue_;
 	std::array<int, kCheckerboardRowNum * kCheckerboardColNum>	checkerboard_;
 };

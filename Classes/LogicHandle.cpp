@@ -47,8 +47,22 @@ void LogicHandle::init_checkerboard()
 	hander_num_ = 0;
 }
 
+// 浏览棋盘
+void LogicHandle::visit_checkerboard(const std::function<void(const cocos2d::Vec2 &, int value)> &func)
+{
+	if (func != nullptr)
+	{
+		for (size_t i = 0; i < checkerboard_.size(); ++i)
+		{
+			int row = i / kCheckerboardColNum;
+			int col = i % kCheckerboardColNum;
+			func(Vec2(col, row), checkerboard_[i]);
+		}
+	}
+}
+
 // 添加事件更新通知
-void LogicHandle::add_event_update_notice(EventUpate &&func)
+void LogicHandle::add_event_update_notice(std::function<void()> &&func)
 {
 	even_update_ = func;
 }

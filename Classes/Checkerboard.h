@@ -9,8 +9,8 @@ class Checkerboard : public cocos2d::Layer
 {
 public:
 	static const int kInterval = 5;					// 棋盘间距
-	static const int kChessPieceWidth = 100;		// 棋子宽度
-	static const int kChessPieceHeight = 100;		// 棋子高度
+	static const int kChessPieceWidth = 120;		// 棋子宽度
+	static const int kChessPieceHeight = 120;		// 棋子高度
 
 public:
 	Checkerboard();

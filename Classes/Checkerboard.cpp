@@ -59,7 +59,7 @@ bool Checkerboard::init()
 		layer->setContentSize(Size(kChessPieceWidth, kChessPieceHeight));
 		layer->setPosition(start_pos + Vec2(col * kChessPieceWidth + col * kInterval, row * kChessPieceHeight + row * kInterval));
 		pieces_[i] = layer;
-		addChild(layer, 1);
+		addChild(layer);
 	}
 
 	// 刷新棋盘
@@ -94,6 +94,20 @@ void Checkerboard::refresh_checkerboard()
 			pieces_[i]->initWithColor(color, kChessPieceWidth, kChessPieceHeight);
 		}
 	}
+
+	// 绘制棋子
+	Vec2 start_pos = get_chesspiece_start_pos();
+	LogicHandle::instance()->visit_checkerboard([&](const cocos2d::Vec2 &pos, int value)
+	{
+		if (value != 0)
+		{
+			Vec2 new_pos(start_pos + Vec2(pos.x * kChessPieceWidth + pos.x * kInterval + kChessPieceWidth / 2,
+				pos.y * kChessPieceHeight + pos.y * kInterval + kChessPieceHeight / 2));
+			Sprite *sp = Sprite::create(value == 1 ? "whiteplay.png" : "blackplay.png");
+			sp->setPosition(new_pos);
+			addChild(sp);
+		}
+	});
 }
 
 // 世界坐标转换棋盘坐标
