@@ -31,7 +31,8 @@ bool HelloWorld::init()
 
 	LogicHandle::instance();
 
-	addChild(Checkerboard::create());
+	auto p = Checkerboard::create();
+	addChild(p);
     
     return true;
 }

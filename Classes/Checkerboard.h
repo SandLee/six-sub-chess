@@ -11,6 +11,7 @@ public:
 	static const int kInterval = 5;					// 棋盘间距
 	static const int kChessPieceWidth = 120;		// 棋子宽度
 	static const int kChessPieceHeight = 120;		// 棋子高度
+	static const int kChessspieceSum = LogicHandle::kCheckerboardRowNum * LogicHandle::kCheckerboardColNum;
 
 public:
 	Checkerboard();
@@ -46,11 +47,29 @@ public:
 	
 	virtual void onTouchCancelled(cocos2d::Touch *touch, cocos2d::Event *unused_event) override;
 
+public:
+	/**
+	 * 更新动作
+	 */
+	void update_action();
+
+	/**
+	 * 执行动作
+	 */
+	void perform_action();
+
+	/**
+	 * 完成动作
+	 */
+	void finished_action();
+
 private:
-	bool real_move_;
-	bool touch_lock_;
-	cocos2d::Vec2 touch_begin_pos_;
-	std::array<cocos2d::LayerColor*, LogicHandle::kCheckerboardRowNum * LogicHandle::kCheckerboardColNum> pieces_;
+	bool												real_move_;
+	bool												action_lock_;
+	cocos2d::Vec2										touch_begin_pos_;
+	std::vector<cocos2d::Sprite *>						free_sprite_;
+	std::array<cocos2d::Sprite *, kChessspieceSum>		chesspiece_sprite_;
+	std::array<cocos2d::LayerColor*, kChessspieceSum>	color_floor_;
 };
 
 #endif
