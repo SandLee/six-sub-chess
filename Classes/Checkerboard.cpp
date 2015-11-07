@@ -116,7 +116,7 @@ void Checkerboard::refresh_checkerboard()
 
 	// 绘制棋子精灵
 	Vec2 start_pos = get_chesspiece_start_pos();
-	LogicHandle::instance()->visit_checkerboard([&](const cocos2d::Vec2 &pos, int value)
+	LogicHandle::instance()->visit_checkerboard([&](const Vec2 &pos, int value)
 	{
 		if (value != 0)
 		{
@@ -146,8 +146,17 @@ void Checkerboard::refresh_checkerboard()
 	});
 }
 
+// 棋盘坐标转换到世界坐标
+Vec2 Checkerboard::convert_to_world_space(const Vec2 &pos) const
+{
+	Vec2 start_pos = get_chesspiece_start_pos();
+	return start_pos +
+		Vec2(pos.x * kChessPieceWidth + pos.x * kInterval + kChessPieceWidth / 2,
+		pos.y * kChessPieceHeight + pos.y * kInterval + kChessPieceHeight / 2);
+}
+
 // 世界坐标转换棋盘坐标
-Vec2 Checkerboard::convert_to_checkerboard_space(const cocos2d::Vec2 &pos) const
+Vec2 Checkerboard::convert_to_checkerboard_space(const Vec2 &pos) const
 {
 	Vec2 start_pos = get_chesspiece_start_pos();
 	int col = (pos.x - start_pos.x - kInterval) / kChessPieceWidth;
@@ -194,6 +203,40 @@ void Checkerboard::onTouchCancelled(Touch *touch, Event *unused_event)
 	onTouchEnded(touch, unused_event);
 }
 
+// 获取棋子精灵
+Sprite* Checkerboard::get_chesspiece_sprite(const Vec2 &pos)
+{
+	int index = pos.y * LogicHandle::kCheckerboardColNum + pos.x;
+	return chesspiece_sprite_[index];
+}
+
+// 移动棋子
+void Checkerboard::on_move_chesspiece(const Vec2 &source, const Vec2 &target)
+{
+	Sprite *chess_piece = get_chesspiece_sprite(source);
+	assert(chess_piece != nullptr);
+	if (chess_piece != nullptr)
+	{
+		Vec2 world_pos = convert_to_world_space(target);
+		chess_piece->runAction(Sequence::create(
+			MoveTo::create(0.1f, world_pos),
+			CallFunc::create([=]()
+		{
+			int s_index = source.y * LogicHandle::kCheckerboardColNum + source.x;
+			int t_index = target.y * LogicHandle::kCheckerboardColNum + target.x;
+			std::swap(chesspiece_sprite_[s_index], chesspiece_sprite_[t_index]);
+		}),
+			CallFunc::create(std::bind(&Checkerboard::finished_action, this)),
+			nullptr));
+	}
+}
+
+// 吃掉棋子
+void Checkerboard::on_kill_chesspiece(const Vec2 &source, const Vec2 &target)
+{
+
+}
+
 // 更新动作
 void Checkerboard::update_action()
 {
@@ -209,6 +252,17 @@ void Checkerboard::perform_action()
 		if (action.type != LogicHandle::EventType::None)
 		{
 			action_lock_ = true;
+
+			// 移动
+			if (action.type == LogicHandle::EventType::Moved)
+			{
+				on_move_chesspiece(action.source, action.target);
+			}
+			// 吃子
+			else if (action.type == LogicHandle::EventType::Killed)
+			{
+				on_kill_chesspiece(action.source, action.target);
+			}
 		}
 	}
 }

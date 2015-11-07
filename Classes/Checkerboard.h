@@ -34,20 +34,15 @@ public:
 	cocos2d::Vec2 get_chesspiece_start_pos() const;
 
 	/**
+	 * 棋盘坐标转换到世界坐标
+	 */
+	cocos2d::Vec2 convert_to_world_space(const cocos2d::Vec2 &pos) const;
+
+	/**
 	 * 世界坐标转换棋盘坐标
 	 */
 	cocos2d::Vec2 convert_to_checkerboard_space(const cocos2d::Vec2 &pos) const;
 
-public:
-	virtual bool onTouchBegan(cocos2d::Touch *touch, cocos2d::Event *unused_event) override;
-
-	virtual void onTouchMoved(cocos2d::Touch *touch, cocos2d::Event *unused_event) override;
-	
-	virtual void onTouchEnded(cocos2d::Touch *touch, cocos2d::Event *unused_event) override;
-	
-	virtual void onTouchCancelled(cocos2d::Touch *touch, cocos2d::Event *unused_event) override;
-
-public:
 	/**
 	 * 更新动作
 	 */
@@ -62,6 +57,31 @@ public:
 	 * 完成动作
 	 */
 	void finished_action();
+
+public:
+	virtual bool onTouchBegan(cocos2d::Touch *touch, cocos2d::Event *unused_event) override;
+
+	virtual void onTouchMoved(cocos2d::Touch *touch, cocos2d::Event *unused_event) override;
+	
+	virtual void onTouchEnded(cocos2d::Touch *touch, cocos2d::Event *unused_event) override;
+	
+	virtual void onTouchCancelled(cocos2d::Touch *touch, cocos2d::Event *unused_event) override;
+
+private:
+	/**
+	 * 获取棋子精灵
+	 */
+	cocos2d::Sprite* get_chesspiece_sprite(const cocos2d::Vec2 &pos);
+
+	/**
+	 * 移动棋子
+	 */
+	void on_move_chesspiece(const cocos2d::Vec2 &source, const cocos2d::Vec2 &target);
+
+	/**
+	 * 吃掉棋子
+	 */
+	void on_kill_chesspiece(const cocos2d::Vec2 &source, const cocos2d::Vec2 &target);
 
 private:
 	bool												real_move_;
