@@ -71,6 +71,7 @@ void LogicHandle::add_event_update_notice(std::function<void()> &&func)
 LogicHandle::EventDetails LogicHandle::take_event_info()
 {
 	EventDetails ret;
+	ret.chesspiece = 0;
 	ret.type = EventType::None;
 	if (!event_queue_.empty())
 	{
@@ -114,6 +115,7 @@ bool LogicHandle::move_chess_piece(const cocos2d::Vec2 &source, const cocos2d::V
 			event.type = EventType::Moved;
 			event.source = source;
 			event.target = target;
+			event.chesspiece = checkerboard_[target.y  * kCheckerboardRowNum + target.x];
 			event_queue_.push(event);
 		}
 	}

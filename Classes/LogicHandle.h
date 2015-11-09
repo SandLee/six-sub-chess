@@ -23,6 +23,7 @@ public:
 
 	struct EventDetails
 	{
+		int chesspiece;
 		EventType type;
 		cocos2d::Vec2 source;
 		cocos2d::Vec2 target;

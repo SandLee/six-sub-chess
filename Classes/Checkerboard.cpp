@@ -251,16 +251,16 @@ void Checkerboard::perform_action()
 		LogicHandle::EventDetails action = LogicHandle::instance()->take_event_info();
 		if (action.type != LogicHandle::EventType::None)
 		{
-			action_lock_ = true;
-
-			// 移动
-			if (action.type == LogicHandle::EventType::Moved)
+			// 移动，自己的移动操作实时处理，不通过逻辑处理器进行
+			if (action.type == LogicHandle::EventType::Moved && action.chesspiece != 1)
 			{
+				action_lock_ = true;
 				on_move_chesspiece(action.source, action.target);
 			}
 			// 吃子
 			else if (action.type == LogicHandle::EventType::Killed)
 			{
+				action_lock_ = true;
 				on_kill_chesspiece(action.source, action.target);
 			}
 		}
