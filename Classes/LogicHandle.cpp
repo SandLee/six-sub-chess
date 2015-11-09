@@ -117,6 +117,8 @@ bool LogicHandle::move_chess_piece(const cocos2d::Vec2 &source, const cocos2d::V
 			event.target = target;
 			event.chesspiece = checkerboard_[target.y  * kCheckerboardRowNum + target.x];
 			event_queue_.push(event);
+
+			// 检测吃子
 		}
 	}
 	return false;

@@ -254,7 +254,21 @@ void Checkerboard::on_move_chesspiece(const Vec2 &source, const Vec2 &target)
 // 吃掉棋子
 void Checkerboard::on_kill_chesspiece(const Vec2 &source, const Vec2 &target)
 {
-
+	Sprite *chess_piece = get_chesspiece_sprite(target);
+	assert(chess_piece != nullptr);
+	if (chess_piece != nullptr)
+	{
+		chess_piece->setVisible(false);
+		chess_piece->runAction(Sequence::create(
+			CallFunc::create([=]()
+		{
+			int s_index = source.y * LogicHandle::kCheckerboardColNum + source.x;
+			int t_index = target.y * LogicHandle::kCheckerboardColNum + target.x;
+			std::swap(chesspiece_sprite_[s_index], chesspiece_sprite_[t_index]);
+		}),
+			CallFunc::create(std::bind(&Checkerboard::finished_action, this)),
+			nullptr));
+	}
 }
 
 // 更新动作
