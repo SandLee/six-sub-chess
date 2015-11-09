@@ -70,6 +70,7 @@ public:
 private:
 	/**
 	 * 获取棋子精灵
+	 * @param pos 棋盘坐标系位置
 	 */
 	cocos2d::Sprite* get_chesspiece_sprite(const cocos2d::Vec2 &pos);
 
@@ -84,8 +85,8 @@ private:
 	void on_kill_chesspiece(const cocos2d::Vec2 &source, const cocos2d::Vec2 &target);
 
 private:
-	bool												real_move_;
 	bool												action_lock_;
+	cocos2d::Sprite*									selected_chesspiece_;
 	cocos2d::Vec2										touch_begin_pos_;
 	std::vector<cocos2d::Sprite *>						free_sprite_;
 	std::array<cocos2d::Sprite *, kChessspieceSum>		chesspiece_sprite_;

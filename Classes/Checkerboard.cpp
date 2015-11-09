@@ -5,7 +5,8 @@
 using namespace cocos2d;
 
 
-const float kMinMoveDistance = 5.0f;
+const int kNormalChessPieceZOrder = 1;
+const int kSelectedChessPieceZOrder = 2;
 const Vec2 kInvalidCheckerboardPos(-1.0f, -1.0f);
 
 
@@ -22,8 +23,8 @@ static std::vector<Color4B> g_seven_colors =
 };
 
 Checkerboard::Checkerboard()
-	: real_move_(false)
-	, action_lock_(false)
+	: action_lock_(false)
+	, selected_chesspiece_(nullptr)
 {
 	for (size_t i = 0; i < chesspiece_sprite_.size(); ++i)
 	{
@@ -90,7 +91,7 @@ void Checkerboard::refresh_checkerboard()
 {
 	// 生成地板
 	std::default_random_engine generator(time(nullptr));
-	std::uniform_int_distribution<int> dis(0, g_seven_colors.size() - 1);
+	std::uniform_int_distribution<int> dis(g_seven_colors.size() - 1, g_seven_colors.size() - 1);
 	const Color4B color = g_seven_colors[dis(generator)];
 
 	for (size_t i = 0; i < color_floor_.size(); ++i)
@@ -139,6 +140,7 @@ void Checkerboard::refresh_checkerboard()
 				chess_piece->setVisible(true);
 			}
 			chess_piece->setPosition(new_pos);
+			chess_piece->setLocalZOrder(kNormalChessPieceZOrder);
 			int index = pos.y * LogicHandle::kCheckerboardColNum + pos.x;
 			assert(chesspiece_sprite_[index] == nullptr);
 			chesspiece_sprite_[index] = chess_piece;
@@ -166,36 +168,54 @@ Vec2 Checkerboard::convert_to_checkerboard_space(const Vec2 &pos) const
 
 bool Checkerboard::onTouchBegan(Touch *touch, Event *unused_event)
 {
-	if (action_lock_)
+	if (!action_lock_)
 	{
-		return false;
+		auto chesspiece = get_chesspiece_sprite(convert_to_checkerboard_space(touch->getLocation()));
+		if (chesspiece != nullptr)
+		{
+			selected_chesspiece_ = chesspiece;
+			selected_chesspiece_->setLocalZOrder(kSelectedChessPieceZOrder);
+			touch_begin_pos_ = touch->getLocation();
+			return true;
+		}
 	}
-	else
-	{
-		touch_begin_pos_ = touch->getLocation();
-		return true;
-	}
+	return false;
 }
 
 void Checkerboard::onTouchMoved(Touch *touch, Event *unused_event)
 {
-	// 防止手滑
-	if (abs(touch->getLocation().distance(touch_begin_pos_)) >= kMinMoveDistance)
+	// 移动棋子
+	assert(selected_chesspiece_ != nullptr);
+	if (selected_chesspiece_ != nullptr)
 	{
-		real_move_ = true;
+		selected_chesspiece_->setPosition(touch->getLocation());
 	}
 }
 
 void Checkerboard::onTouchEnded(Touch *touch, Event *unused_event)
 {
-	if (real_move_)
+	if (selected_chesspiece_ != nullptr)
 	{
-		real_move_ = false;
-		auto src = convert_to_checkerboard_space(touch_begin_pos_);
-		auto goes = convert_to_checkerboard_space(touch->getLocation());
-		CCLOG("Vec2(%f, %f) Move To Vec2(%f, %f)", src.x, src.y, goes.x, goes.y);
-		LogicHandle::instance()->move_chess_piece(src, goes);
-	}
+		auto source = convert_to_checkerboard_space(touch_begin_pos_);
+		auto target = convert_to_checkerboard_space(touch->getLocation());
+
+		if (LogicHandle::instance()->is_adjacent(source, target))
+		{
+			selected_chesspiece_->setPosition(convert_to_world_space(target));
+			LogicHandle::instance()->move_chess_piece(source, target);
+
+			int s_index = source.y * LogicHandle::kCheckerboardColNum + source.x;
+			int t_index = target.y * LogicHandle::kCheckerboardColNum + target.x;
+			std::swap(chesspiece_sprite_[s_index], chesspiece_sprite_[t_index]);
+		}
+		else
+		{
+			selected_chesspiece_->setPosition(convert_to_world_space(source));
+		}
+
+		selected_chesspiece_->setLocalZOrder(kNormalChessPieceZOrder);
+		selected_chesspiece_ = nullptr;
+	}	
 }
 
 void Checkerboard::onTouchCancelled(Touch *touch, Event *unused_event)

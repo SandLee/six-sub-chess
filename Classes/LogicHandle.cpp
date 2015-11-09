@@ -96,7 +96,7 @@ bool LogicHandle::is_valid_chess_piece(const cocos2d::Vec2 &pos) const
 // 是否相邻
 bool LogicHandle::is_adjacent(const cocos2d::Vec2 &a, const cocos2d::Vec2 &b) const
 {
-	return is_in_checkerboard(a) && is_in_checkerboard(a) && abs(b.x - a.x + b.y - a.y) == 1;
+	return is_in_checkerboard(a) && is_in_checkerboard(a) && (abs(b.x - a.x) + abs(b.y - a.y) == 1);
 }
 
 // 移动棋子
