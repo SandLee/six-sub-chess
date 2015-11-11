@@ -140,21 +140,14 @@ void LogicHandle::update(float dt)
 
 bool LogicHandle::check(const cocos2d::Vec2 &pos) const
 {
-	if (!is_in_checkerboard(pos))
+	if (!is_valid_chess_piece(pos))
 	{
 		return false;
 	}
 
-	int last_type = -1;
-	unsigned int continuity = 0;
-	unsigned int continuity_same_type = 0;
-	for (int i = 0; i < kCheckerboardColNum; ++i)
-	{
-		int index = pos.y * kCheckerboardColNum + i;
-
-	}
-
-	CCLOG("continuity: %u, continuity_type: %u", continuity, continuity_same_type);
+	/*
+	....
+	*/
 
 	return true;
 }
