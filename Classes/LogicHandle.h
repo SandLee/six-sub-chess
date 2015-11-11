@@ -80,6 +80,9 @@ public:
 	void update(float dt);
 
 private:
+	bool check(const cocos2d::Vec2 &pos) const;
+
+private:
 	unsigned int												hander_num_;
 	std::function<void()>										even_update_;
 	std::queue<EventDetails>									event_queue_;

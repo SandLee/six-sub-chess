@@ -163,6 +163,8 @@ Vec2 Checkerboard::convert_to_checkerboard_space(const Vec2 &pos) const
 	Vec2 start_pos = get_chesspiece_start_pos();
 	int col = (pos.x - start_pos.x - kInterval) / kChessPieceWidth;
 	int row = (pos.y - start_pos.y - kInterval) / kChessPieceHeight;
+	col = col < 0 ? 0 : col >= LogicHandle::kCheckerboardColNum ? LogicHandle::kCheckerboardColNum - 1 : col;
+	row = row < 0 ? 0 : row >= LogicHandle::kCheckerboardRowNum ? LogicHandle::kCheckerboardRowNum - 1 : row;
 	return Vec2(col , row);
 }
 
@@ -199,7 +201,8 @@ void Checkerboard::onTouchEnded(Touch *touch, Event *unused_event)
 		auto source = convert_to_checkerboard_space(touch_begin_pos_);
 		auto target = convert_to_checkerboard_space(touch->getLocation());
 
-		if (LogicHandle::instance()->is_adjacent(source, target))
+		if (LogicHandle::instance()->is_adjacent(source, target) &&
+			!LogicHandle::instance()->is_valid_chess_piece(target))
 		{
 			selected_chesspiece_->setPosition(convert_to_world_space(target));
 			LogicHandle::instance()->move_chess_piece(source, target);
