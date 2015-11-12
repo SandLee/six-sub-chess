@@ -265,9 +265,9 @@ void Checkerboard::on_kill_chesspiece(const Vec2 &source, const Vec2 &target)
 		chess_piece->runAction(Sequence::create(
 			CallFunc::create([=]()
 		{
-			int s_index = source.y * LogicHandle::kCheckerboardColNum + source.x;
-			int t_index = target.y * LogicHandle::kCheckerboardColNum + target.x;
-			std::swap(chesspiece_sprite_[s_index], chesspiece_sprite_[t_index]);
+			int index = target.y * LogicHandle::kCheckerboardColNum + target.x;
+			free_sprite_.push_back(chesspiece_sprite_[index]);
+			chesspiece_sprite_[index] = nullptr;
 		}),
 			CallFunc::create(std::bind(&Checkerboard::finished_action, this)),
 			nullptr));
@@ -286,16 +286,24 @@ void Checkerboard::perform_action()
 	if (!action_lock_)
 	{
 		LogicHandle::EventDetails action = LogicHandle::instance()->take_event_info();
-		if (action.type != LogicHandle::EventType::None)
+		if (action.type != LogicHandle::EventType::NONE)
 		{
 			// 移动，自己的移动操作实时处理，不通过逻辑处理器进行
-			if (action.type == LogicHandle::EventType::Moved && action.chesspiece != 1)
+			if (action.type == LogicHandle::EventType::MOVED)
 			{
-				action_lock_ = true;
-				on_move_chesspiece(action.source, action.target);
+				if (action.chesspiece != 1)
+				{
+					action_lock_ = true;
+					on_move_chesspiece(action.source, action.target);
+				}
+				else
+				{
+					perform_action();
+					return;
+				}
 			}
 			// 吃子
-			else if (action.type == LogicHandle::EventType::Killed)
+			else if (action.type == LogicHandle::EventType::KILLED)
 			{
 				action_lock_ = true;
 				on_kill_chesspiece(action.source, action.target);

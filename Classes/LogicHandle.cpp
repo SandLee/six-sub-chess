@@ -1,5 +1,6 @@
 ﻿#include "LogicHandle.h"
 
+#include <numeric>
 #include "json/document.h"
 using namespace cocos2d;
 
@@ -41,7 +42,7 @@ void LogicHandle::init_checkerboard()
 	{
 		int row = i / kCheckerboardColNum;
 		int col = i % kCheckerboardColNum;
-		checkerboard_[row * kCheckerboardRowNum + col] = doc[doc.Size() - i - 1].GetInt();
+		checkerboard_[row * kCheckerboardRowNum + col] = static_cast<ChessPieceType>(doc[doc.Size() - i - 1].GetInt());
 	}
 
 	hander_num_ = 0;
@@ -72,7 +73,7 @@ LogicHandle::EventDetails LogicHandle::take_event_info()
 {
 	EventDetails ret;
 	ret.chesspiece = 0;
-	ret.type = EventType::None;
+	ret.type = EventType::NONE;
 	if (!event_queue_.empty())
 	{
 		ret = event_queue_.front();
@@ -90,7 +91,7 @@ bool LogicHandle::is_in_checkerboard(const cocos2d::Vec2 &pos) const
 // 棋子是否有效
 bool LogicHandle::is_valid_chess_piece(const cocos2d::Vec2 &pos) const
 {
-	return is_in_checkerboard(pos) && checkerboard_[pos.y  * kCheckerboardRowNum + pos.x] != 0;
+	return is_in_checkerboard(pos) && checkerboard_[pos.y  * kCheckerboardRowNum + pos.x] != ChessPieceType::None;
 }
 
 // 是否相邻
@@ -112,14 +113,24 @@ bool LogicHandle::move_chess_piece(const cocos2d::Vec2 &source, const cocos2d::V
 			// 新增事件
 			++hander_num_;
 			EventDetails event;
-			event.type = EventType::Moved;
+			event.type = EventType::MOVED;
 			event.source = source;
 			event.target = target;
 			event.chesspiece = checkerboard_[target.y  * kCheckerboardRowNum + target.x];
 			event_queue_.push(event);
 
 			// 检测吃子
-			check(target);
+			std::set<Vec2> killed_set = check_kill_chesspiece(target);
+			for (auto &pos : killed_set)
+			{
+				checkerboard_[pos.y  * kCheckerboardRowNum + pos.x] = ChessPieceType::None;
+
+				event.type = EventType::KILLED;
+				event.source = target;
+				event.target = pos;
+				event.chesspiece = checkerboard_[target.y  * kCheckerboardRowNum + target.x];
+				event_queue_.push(event);
+			}
 		}
 	}
 	return false;
@@ -138,16 +149,120 @@ void LogicHandle::update(float dt)
 	}
 }
 
-bool LogicHandle::check(const cocos2d::Vec2 &pos) const
+// 获取横向相连的棋子
+std::vector<Vec2> LogicHandle::get_chesspieces_with_horizontal(const Vec2 &pos) const
 {
-	if (!is_valid_chess_piece(pos))
+	int continuous = 0;
+	std::vector<Vec2> ret;
+	int last_type = checkerboard_[pos.y * kCheckerboardColNum];
+	for (int i = 0; i < kCheckerboardColNum; ++i)
 	{
-		return false;
+		int idx = pos.y * kCheckerboardColNum + i;
+		if (checkerboard_[idx] != ChessPieceType::None)
+		{
+			++continuous;
+			ret.push_back(Vec2(i, pos.y));
+		}
+		else
+		{
+			if (continuous == 3)
+			{
+				break;
+			}
+			else
+			{
+				continuous = 0;
+				ret.clear();
+			}
+		}
 	}
 
-	/*
-	....
-	*/
+	if (ret.size() != 3)
+	{
+		ret.clear();
+	}
 
-	return true;
+	return ret;
+}
+
+// 获取纵向相连的棋子
+std::vector<Vec2> LogicHandle::get_chesspieces_with_vertical(const Vec2 &pos) const
+{
+	int continuous = 0;
+	std::vector<Vec2> ret;
+	int last_type = checkerboard_[pos.y * kCheckerboardColNum];
+	for (int i = 0; i < kCheckerboardRowNum; ++i)
+	{
+		int idx = i * kCheckerboardColNum + pos.x;
+		if (checkerboard_[idx] != ChessPieceType::None)
+		{
+			++continuous;
+			ret.push_back(Vec2(pos.x, i));
+		}
+		else
+		{
+			if (continuous == 3)
+			{
+				break;
+			}
+			else
+			{
+				continuous = 0;
+				ret.clear();
+			}
+		}
+	}
+
+	if (ret.size() != 3)
+	{
+		ret.clear();
+	}
+
+	return ret;
+}
+
+// 获取可杀死的棋子
+void LogicHandle::get_killed_chesspiece(ChessPieceType key, const std::vector<cocos2d::Vec2> &chesspieces, std::set<cocos2d::Vec2> &ret) const
+{
+	if (chesspieces.size() == 3)
+	{
+		size_t sum = std::accumulate(chesspieces.begin(), chesspieces.end(), 0, [=](size_t sum, const Vec2 &item)->size_t
+		{
+			if (key == checkerboard_[item.y * kCheckerboardColNum + item.x])
+			{
+				return sum + 1;
+			}
+			return sum;
+		});
+
+		if (sum == 2)
+		{
+			for (size_t i = 0; i < chesspieces.size(); ++i)
+			{
+				int index = chesspieces[i].y * kCheckerboardColNum + chesspieces[i].x;
+				if (checkerboard_[index] != key)
+				{
+					ret.insert(chesspieces[i]);
+				}
+			}
+		}
+	}
+}
+
+// 检查杀死棋子
+std::set<Vec2> LogicHandle::check_kill_chesspiece(const Vec2 &pos) const
+{
+	std::set<Vec2> killed_set;
+	if (!is_valid_chess_piece(pos))
+	{
+		return killed_set;
+	}
+
+	const ChessPieceType key = checkerboard_[pos.y * kCheckerboardColNum + pos.x];
+	const auto v_array = get_chesspieces_with_vertical(pos);
+	const auto h_array = get_chesspieces_with_horizontal(pos);
+	get_killed_chesspiece(key, v_array, killed_set);
+	get_killed_chesspiece(key, h_array, killed_set);
+
+	return killed_set;
 }

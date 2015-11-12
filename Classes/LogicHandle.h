@@ -14,11 +14,18 @@ class LogicHandle : public Singleton<LogicHandle>
 	SINGLETON(LogicHandle);
 
 public:
-	enum class EventType
+	enum ChessPieceType
 	{
 		None,
-		Moved,				// 移动了
-		Killed,				// 吃掉了
+		WHITE = 1,		// 白棋
+		BLACK = 2,		// 黑棋
+	};
+
+	enum class EventType
+	{
+		NONE,
+		MOVED,				// 移动了
+		KILLED,				// 吃掉了
 	};
 
 	struct EventDetails
@@ -80,13 +87,33 @@ public:
 	void update(float dt);
 
 private:
-	bool check(const cocos2d::Vec2 &pos) const;
+	/**
+	 * 获取横向相连的棋子
+	 */
+	std::vector<cocos2d::Vec2> get_chesspieces_with_horizontal(const cocos2d::Vec2 &pos) const;
+
+	/**
+	 * 获取纵向相连的棋子
+	 */
+	std::vector<cocos2d::Vec2> get_chesspieces_with_vertical(const cocos2d::Vec2 &pos) const;
+
+	/**
+	 * 获取可杀死的棋子
+	 * @param std::vector<cocos2d::Vec2> 相连的棋子列表
+	 * @param std::set<cocos2d::Vec2> 可杀死的棋子
+	 */
+	void get_killed_chesspiece(ChessPieceType key, const std::vector<cocos2d::Vec2> &chesspieces, std::set<cocos2d::Vec2> &ret) const;
+
+	/**
+	 * 检查杀死棋子
+	 */
+	std::set<cocos2d::Vec2> check_kill_chesspiece(const cocos2d::Vec2 &pos) const;
 
 private:
-	unsigned int												hander_num_;
-	std::function<void()>										even_update_;
-	std::queue<EventDetails>									event_queue_;
-	std::array<int, kCheckerboardRowNum * kCheckerboardColNum>	checkerboard_;
+	unsigned int															hander_num_;
+	std::function<void()>													even_update_;
+	std::queue<EventDetails>												event_queue_;
+	std::array<ChessPieceType, kCheckerboardRowNum * kCheckerboardColNum>	checkerboard_;
 };
 
 #endif
