@@ -24,16 +24,16 @@
     <ClCompile Include="..\Classes\VisibleRect.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\Checkerboard.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\LogicHandle.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="..\Classes\Singleton.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\Robot.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\CheckerboardLayer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\CoreLogic.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -50,16 +50,16 @@
     <ClInclude Include="..\Classes\VisibleRect.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\Checkerboard.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\LogicHandle.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="..\Classes\Singleton.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\Robot.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\CheckerboardLayer.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\CoreLogic.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
