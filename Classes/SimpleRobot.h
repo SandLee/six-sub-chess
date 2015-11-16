@@ -4,11 +4,11 @@
 class SimpleRobot
 {
 public:
-	SimpleRobot();
-	~SimpleRobot();
+	SimpleRobot() = delete;
+	~SimpleRobot() = delete;
 
 public:
-	void OnMoveChess();
+	//static void on_move_chess(const ChessArray checkerboard, GameLogic::ChessPieceType chess_type);
 };
 
 #endif

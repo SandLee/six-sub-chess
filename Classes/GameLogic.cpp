@@ -1,85 +1,72 @@
 ﻿#include "GameLogic.h"
+#include <cassert>
 
-#include <numeric>
-#include "json/document.h"
-using namespace cocos2d;
-
-
-GameLogic::GameLogic()
-	: hander_num_(0)
+GameLogic::GameLogic(const ChessArray &checkerboard)
+	: lock_(false)
+	, checkerboard_(checkerboard)
 {
-	init_checkerboard();
 
-	// 开启定时器
-	Director::getInstance()->getScheduler()->scheduleUpdate(this, 0, false);
 }
 
 GameLogic::~GameLogic()
 {
-	// 关闭定时器
-	Director::getInstance()->getScheduler()->unscheduleUpdate(this);
+
 }
 
-// 初始化棋盘
-void GameLogic::init_checkerboard()
+// 取出动作信息
+GameLogic::Action GameLogic::take_action_from_queue()
 {
-	Data data = FileUtils::getInstance()->getDataFromFile("config/init.json");
-
-	// 解析json
-	rapidjson::Document doc;
-	doc.Parse<0>(std::string((const char *)data.getBytes(), data.getSize()).c_str());
-	if (doc.HasParseError() || !doc.IsArray())
+	Action action;
+	action.type = ActionType::NONE;
+	action.chess_type = ChessPieceType::NONE;
+	if (!action_queue_.empty())
 	{
-		CCAssert(false, "Json parse error!");
+		action = action_queue_.front();
+		action_queue_.pop();
 	}
+	return action;
+}
 
-	if (doc.Size() != kCheckerboardRowNum * kCheckerboardColNum)
-	{
-		CCAssert(false, "Array size error!");
-	}
+// 添加动作更新通知
+void GameLogic::add_action_update_callback(std::function<void()> &&callback)
+{
+	action_callback_ = callback;
+}
 
-	for (size_t i = 0; i < doc.Size(); ++i)
-	{
-		int row = i / kCheckerboardColNum;
-		int col = i % kCheckerboardColNum;
-		checkerboard_[row * kCheckerboardRowNum + col] = static_cast<ChessPieceType>(doc[doc.Size() - i - 1].GetInt());
-	}
-
-	hander_num_ = 0;
+// 获取棋盘数据
+const GameLogic::ChessArray& GameLogic::get_checkerboard() const
+{
+	return checkerboard_;
 }
 
 // 浏览棋盘
-void GameLogic::visit_checkerboard(const std::function<void(const cocos2d::Vec2 &, int value)> &func)
+void GameLogic::visit_checkerboard(const std::function<void(const Vec2&, ChessPieceType type)> &callback)
 {
-	if (func != nullptr)
+	if (callback != nullptr)
 	{
 		for (size_t i = 0; i < checkerboard_.size(); ++i)
 		{
 			int row = i / kCheckerboardColNum;
 			int col = i % kCheckerboardColNum;
-			func(Vec2(col, row), checkerboard_[i]);
+			callback(Vec2(col, row), checkerboard_[i]);
 		}
 	}
 }
 
-// 添加事件更新通知
-void GameLogic::add_event_update_notice(std::function<void()> &&func)
+// 添加动作
+void GameLogic::add_action(ActionType type, ChessPieceType chess_type, const Vec2 &source, const Vec2 &target)
 {
-	even_update_ = func;
-}
+	Action action;
+	action.type = type;
+	action.source = source;
+	action.target = target;
+	action.chess_type = chess_type;
+	action_queue_.push(action);
 
-// 取出事件信息
-GameLogic::EventDetails GameLogic::take_event_info()
-{
-	EventDetails ret;
-	ret.chess_type = ChessPieceType::NONE;
-	ret.type = EventType::NONE;
-	if (!event_queue_.empty())
+	if (action_callback_ != nullptr)
 	{
-		ret = event_queue_.front();
-		event_queue_.pop();
+		action_callback_();
 	}
-	return ret;
 }
 
 // 是否在棋盘
@@ -97,11 +84,7 @@ bool GameLogic::is_valid_chess_piece(const Vec2 &pos) const
 // 获取棋子类型
 GameLogic::ChessPieceType GameLogic::get_chesspiece_type(const Vec2 &pos) const
 {
-	if (!is_valid_chess_piece(pos))
-	{
-		return GameLogic::NONE;
-	}
-	return checkerboard_[pos.y  * kCheckerboardRowNum + pos.x];
+	return is_valid_chess_piece(pos) ? checkerboard_[pos.y  * kCheckerboardRowNum + pos.x] : GameLogic::NONE;
 }
 
 // 是否相邻
@@ -113,6 +96,9 @@ bool GameLogic::is_adjacent(const Vec2 &a, const Vec2 &b) const
 // 移动棋子
 bool GameLogic::move_chess_piece(const Vec2 &source, const Vec2 &target)
 {
+	assert(lock_ == false);
+	lock_ = true;
+
 	if (source != target)
 	{
 		if (is_valid_chess_piece(source) && !is_valid_chess_piece(target) && is_adjacent(source, target))
@@ -120,58 +106,33 @@ bool GameLogic::move_chess_piece(const Vec2 &source, const Vec2 &target)
 			// 交换数据
 			std::swap(checkerboard_[source.y  * kCheckerboardRowNum + source.x], checkerboard_[target.y  * kCheckerboardRowNum + target.x]);
 
-			// 新增事件
-			++hander_num_;
-			EventDetails event;
-			event.type = EventType::MOVED;
-			event.source = source;
-			event.target = target;
-			event.chess_type = checkerboard_[target.y  * kCheckerboardRowNum + target.x];
-			event_queue_.push(event);
+			// 新增动作
+			add_action(ActionType::MOVED, checkerboard_[target.y  * kCheckerboardRowNum + target.x], source, target);
 
 			// 检测吃子
 			std::set<Vec2> killed_set = GameLogic::check_kill_chesspiece(checkerboard_, target);
 			for (auto &pos : killed_set)
 			{
 				checkerboard_[pos.y  * kCheckerboardRowNum + pos.x] = ChessPieceType::NONE;
-				event.type = EventType::KILLED;
-				event.source = target;
-				event.target = pos;
-				event_queue_.push(event);
+				add_action(ActionType::KILLED, ChessPieceType::NONE, target, pos);
 			}
 
-			// 通知出棋
-			ChessPieceType chess_type = event.chess_type == ChessPieceType::WHITE ? ChessPieceType::BLACK : ChessPieceType::WHITE;
-			for (size_t i = 0; i < checkerboard_.size(); ++i)
-			{
-				if (checkerboard_[i] == chess_type)
-				{
-					// 优先计算能否吃子
-					
+			// 玩家待机
+			ChessPieceType type = checkerboard_[target.y  * kCheckerboardRowNum + target.x];
+			type = type == ChessPieceType::WHITE ? ChessPieceType::BLACK : ChessPieceType::WHITE;
+			add_action(ActionType::STANDBY, type, Vec2(), Vec2());
 
-					// 其次计算能否被吃
-				}
-			}
+			lock_ = false;
+			return true;
 		}
 	}
+
+	lock_ = false;
 	return false;
 }
 
-// 定时器更新
-void GameLogic::update(float dt)
-{
-	while (hander_num_ > 0)
-	{
-		--hander_num_;
-		if (even_update_ != nullptr)
-		{
-			even_update_();
-		}
-	}
-}
-
 // 获取横向相连的棋子
-std::vector<Vec2> GameLogic::get_chesspieces_with_horizontal(const ChessArray &checkerboard, const Vec2 &pos)
+std::vector<GameLogic::Vec2> GameLogic::get_chesspieces_with_horizontal(const ChessArray &checkerboard, const Vec2 &pos)
 {
 	int continuous = 0;
 	std::vector<Vec2> ret;
@@ -207,7 +168,7 @@ std::vector<Vec2> GameLogic::get_chesspieces_with_horizontal(const ChessArray &c
 }
 
 // 获取纵向相连的棋子
-std::vector<Vec2> GameLogic::get_chesspieces_with_vertical(const ChessArray &checkerboard, const cocos2d::Vec2 &pos)
+std::vector<GameLogic::Vec2> GameLogic::get_chesspieces_with_vertical(const ChessArray &checkerboard, const Vec2 &pos)
 {
 	int continuous = 0;
 	std::vector<Vec2> ret;
@@ -242,8 +203,8 @@ std::vector<Vec2> GameLogic::get_chesspieces_with_vertical(const ChessArray &che
 	return ret;
 }
 
-// 获取可吃掉的棋子
-std::set<Vec2> GameLogic::get_killed_chesspiece(const ChessArray &checkerboard, ChessPieceType key, const std::vector<Vec2> &chesspieces)
+// 获取可杀死的棋子
+std::set<GameLogic::Vec2> GameLogic::get_killed_chesspiece(const ChessArray &checkerboard, ChessPieceType key, const std::vector<Vec2> &chesspieces)
 {
 	std::set<Vec2> ret;
 	if (chesspieces.size() == 3)
@@ -273,8 +234,8 @@ std::set<Vec2> GameLogic::get_killed_chesspiece(const ChessArray &checkerboard, 
 	return ret;
 }
 
-// 检查杀死棋子
-std::set<Vec2> GameLogic::check_kill_chesspiece(const ChessArray &checkerboard, const cocos2d::Vec2 &pos)
+// 检查可吃掉的棋子
+std::set<GameLogic::Vec2> GameLogic::check_kill_chesspiece(const ChessArray &checkerboard, const Vec2 &pos)
 {
 	auto key = checkerboard[pos.y * kCheckerboardColNum + pos.x];
 	auto v_array = GameLogic::get_chesspieces_with_vertical(checkerboard, pos);

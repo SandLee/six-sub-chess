@@ -1,39 +1,72 @@
-﻿#ifndef __LOGICHANDLE_H__
-#define __LOGICHANDLE_H__
+﻿#ifndef __GAMELOGIC_H__
+#define __GAMELOGIC_H__
 
-
-#include <queue>
+#include <set>
 #include <array>
+#include <queue>
+#include <numeric>
 #include <functional>
-#include "cocos2d.h"
-#include "Singleton.h"
 
-
-class GameLogic : public Singleton<GameLogic>
+class GameLogic
 {
-	SINGLETON(GameLogic);
-
 public:
+	/**
+	 * 棋子类型枚举
+	 */
 	enum ChessPieceType
 	{
 		NONE,
-		WHITE = 1,		// 白棋
-		BLACK = 2,		// 黑棋
+		WHITE = 1,									// 白棋
+		BLACK = 2,									// 黑棋
 	};
 
-	enum class EventType
+	/**
+	 * 动作类型枚举
+	 */
+	enum class ActionType
 	{
 		NONE,
-		MOVED,				// 移动了
-		KILLED,				// 吃掉了
+		MOVED,										// 移动
+		KILLED,										// 吃子
+		STANDBY,									// 待机
 	};
 
-	struct EventDetails
+	/**
+	 * 二维坐标
+	 */
+	struct Vec2
 	{
-		EventType type;
-		ChessPieceType chess_type;
-		cocos2d::Vec2 source;
-		cocos2d::Vec2 target;
+		int x;
+		int y;
+
+		Vec2() : x(0), y(0) {}
+		Vec2(int _x, int _y) : x(_x), y(_y) {}
+
+		bool operator!= (const Vec2 &that) const
+		{
+			return x != that.x || y != that.y;
+		}
+
+		bool operator== (const Vec2 &that) const
+		{
+			return x == that.x && y == that.y;
+		}
+
+		bool operator< (const Vec2 &that) const
+		{
+			return y < that.y ? true : y == that.y ? x < that.x : false;
+		}
+	};
+
+	/**
+	 * 动作信息
+	 */
+	struct Action
+	{
+		ActionType		type;						// 动作类型
+		ChessPieceType	chess_type;					// 棋子类型
+		Vec2			source;						// 来源位置
+		Vec2			target;						// 目标位置
 	};
 
 	static const int kCheckerboardRowNum = 4;		// 棋盘行数
@@ -42,92 +75,101 @@ public:
 	typedef std::array<ChessPieceType, kCheckerboardRowNum * kCheckerboardColNum> ChessArray;
 
 public:
-	/**
-	 * 初始化棋盘
-	 */
-	void init_checkerboard();
+	GameLogic(const ChessArray &checkerboard);
+
+	~GameLogic();
 
 	/**
-	 * 浏览棋盘
+	 * 取出动作信息
 	 */
-	void visit_checkerboard(const std::function<void(const cocos2d::Vec2 &, int value)> &func);
+	Action take_action_from_queue();
 
 	/**
-	 * 添加事件更新通知
+	 * 添加动作更新回调
 	 */
-	void add_event_update_notice(std::function<void()> &&func);
+	void add_action_update_callback(std::function<void()> &&callback);
 
 	/**
-	 * 取出事件信息
-	 */
-	EventDetails take_event_info();
+	* 获取棋盘数据
+	*/
+	const ChessArray& get_checkerboard() const;
+
+	/**
+	* 浏览棋盘
+	*/
+	void visit_checkerboard(const std::function<void(const Vec2&, ChessPieceType type)> &callback);
 
 	/**
 	 * 是否在棋盘
 	 */
-	bool is_in_checkerboard(const cocos2d::Vec2 &pos) const;
+	bool is_in_checkerboard(const Vec2 &pos) const;
 
 	/**
 	 * 棋子是否有效
 	 */
-	bool is_valid_chess_piece(const cocos2d::Vec2 &pos) const;
+	bool is_valid_chess_piece(const Vec2 &pos) const;
 
 	/**
 	 * 获取棋子类型
 	 */
-	GameLogic::ChessPieceType get_chesspiece_type(const cocos2d::Vec2 &pos) const;
+	GameLogic::ChessPieceType get_chesspiece_type(const Vec2 &pos) const;
 
 	/**
 	 * 是否相邻
 	 */
-	bool is_adjacent(const cocos2d::Vec2 &a, const cocos2d::Vec2 &b) const;
+	bool is_adjacent(const Vec2 &a, const Vec2 &b) const;
 
 	/**
 	 * 移动棋子
 	 */
-	bool move_chess_piece(const cocos2d::Vec2 &source, const cocos2d::Vec2 &target);
-
-	/**
-	 * 定时器更新
-	 */
-	void update(float dt);
+	bool move_chess_piece(const Vec2 &source, const Vec2 &target);
 
 public:
 	/**
 	 * 获取横向相连的棋子
 	 * @param ChessArray 棋牌信息
-	 * @param cocos2d::Vec2 移动过的棋子的位置
+	 * @param Vec2 移动过的棋子的位置
 	 */
-	static std::vector<cocos2d::Vec2> get_chesspieces_with_horizontal(const ChessArray &checkerboard, const cocos2d::Vec2 &pos);
+	static std::vector<Vec2> get_chesspieces_with_horizontal(const ChessArray &checkerboard, const Vec2 &pos);
 
 	/**
 	 * 获取纵向相连的棋子
 	 * @param ChessArray 棋牌信息
-	 * @param cocos2d::Vec2 移动过的棋子的位置
+	 * @param Vec2 移动过的棋子的位置
 	 */
-	static std::vector<cocos2d::Vec2> get_chesspieces_with_vertical(const ChessArray &checkerboard, const cocos2d::Vec2 &pos);
+	static std::vector<Vec2> get_chesspieces_with_vertical(const ChessArray &checkerboard, const Vec2 &pos);
 
 	/**
 	 * 获取可杀死的棋子
 	 * @param ChessArray 棋牌信息
 	 * @param ChessPieceType 移动过的棋子的类型
-	 * @param std::vector<cocos2d::Vec2> 相连的棋子列表
-	 * @return std::set<cocos2d::Vec2> 可吃掉的棋子
+	 * @param std::vector<Vec2> 相连的棋子列表
+	 * @return std::set<Vec2> 可吃掉的棋子
 	 */
-	static std::set<cocos2d::Vec2> get_killed_chesspiece(const ChessArray &checkerboard, ChessPieceType key, const std::vector<cocos2d::Vec2> &chesspieces);
+	static std::set<Vec2> get_killed_chesspiece(const ChessArray &checkerboard, ChessPieceType key, const std::vector<Vec2> &chesspieces);
 
 	/**
 	 * 检查可吃掉的棋子
 	 * @param ChessArray 棋牌信息
-	 * @param cocos2d::Vec2 移动过的棋子的位置
+	 * @param Vec2 移动过的棋子的位置
 	 */
-	static std::set<cocos2d::Vec2> check_kill_chesspiece(const ChessArray &checkerboard, const cocos2d::Vec2 &pos);
+	static std::set<Vec2> check_kill_chesspiece(const ChessArray &checkerboard, const Vec2 &pos);
+
+protected:
+	GameLogic(const GameLogic&) = delete;
+	GameLogic& operator= (const GameLogic&) = delete;
 
 private:
-	unsigned int				hander_num_;
-	std::function<void()>		even_update_;
-	std::queue<EventDetails>	event_queue_;
-	ChessArray					checkerboard_;
+	/**
+	 * 添加动作
+	 */
+	void add_action(ActionType type, ChessPieceType chess_type, const Vec2 &source, const Vec2 &target);
+
+private:
+	bool					lock_;
+	std::function<void()>	action_callback_;
+	std::queue<Action>		action_queue_;
+	ChessArray				checkerboard_;
 };
 
 #endif

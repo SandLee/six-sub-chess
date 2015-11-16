@@ -2,8 +2,8 @@
 #define __CHECKERBOARD_H__
 
 #include <array>
+#include "cocos2d.h"
 #include "GameLogic.h"
-
 
 class CheckerboardLayer : public cocos2d::Layer
 {
@@ -14,19 +14,19 @@ public:
 	static const int kChessspieceSum = GameLogic::kCheckerboardRowNum * GameLogic::kCheckerboardColNum;
 
 public:
-	CheckerboardLayer(GameLogic::ChessPieceType type);
+	CheckerboardLayer();
 
 	~CheckerboardLayer();
 
 	virtual bool init() override;
 
-	static CheckerboardLayer* create(GameLogic::ChessPieceType type);
+	CREATE_FUNC(CheckerboardLayer);
 
 public:
 	/**
-	 * 刷新棋盘
+	 * 是否已设定逻辑
 	 */
-	void refresh_checkerboard();
+	bool has_logic() const;
 
 	/**
 	 * 获取棋子开始位置
@@ -37,6 +37,11 @@ public:
 	 * 获取棋子类型
 	 */
 	GameLogic::ChessPieceType get_chesspiece_type() const;
+
+	/**
+	 * 生成棋盘
+	 */
+	void generate_chessboard(GameLogic::ChessPieceType type, GameLogic *logic);
 
 	/**
 	 * 棋盘坐标转换到世界坐标
@@ -95,6 +100,7 @@ private:
 	void on_kill_chesspiece(const cocos2d::Vec2 &source, const cocos2d::Vec2 &target);
 
 private:
+	GameLogic*											logic_;
 	bool												action_lock_;
 	GameLogic::ChessPieceType							chesspiece_type_;
 	cocos2d::Sprite*									selected_chesspiece_;
