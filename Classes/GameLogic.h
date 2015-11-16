@@ -30,8 +30,8 @@ public:
 
 	struct EventDetails
 	{
-		int chesspiece;
 		EventType type;
+		ChessPieceType chess_type;
 		cocos2d::Vec2 source;
 		cocos2d::Vec2 target;
 	};
@@ -39,6 +39,7 @@ public:
 	static const int kCheckerboardRowNum = 4;		// 棋盘行数
 	static const int kCheckerboardColNum = 4;		// 棋盘列数
 
+	typedef std::array<ChessPieceType, kCheckerboardRowNum * kCheckerboardColNum> ChessArray;
 
 public:
 	/**
@@ -91,34 +92,42 @@ public:
 	 */
 	void update(float dt);
 
-private:
+public:
 	/**
 	 * 获取横向相连的棋子
+	 * @param ChessArray 棋牌信息
+	 * @param cocos2d::Vec2 移动过的棋子的位置
 	 */
-	std::vector<cocos2d::Vec2> get_chesspieces_with_horizontal(const cocos2d::Vec2 &pos) const;
+	static std::vector<cocos2d::Vec2> get_chesspieces_with_horizontal(const ChessArray &checkerboard, const cocos2d::Vec2 &pos);
 
 	/**
 	 * 获取纵向相连的棋子
+	 * @param ChessArray 棋牌信息
+	 * @param cocos2d::Vec2 移动过的棋子的位置
 	 */
-	std::vector<cocos2d::Vec2> get_chesspieces_with_vertical(const cocos2d::Vec2 &pos) const;
+	static std::vector<cocos2d::Vec2> get_chesspieces_with_vertical(const ChessArray &checkerboard, const cocos2d::Vec2 &pos);
 
 	/**
 	 * 获取可杀死的棋子
+	 * @param ChessArray 棋牌信息
+	 * @param ChessPieceType 移动过的棋子的类型
 	 * @param std::vector<cocos2d::Vec2> 相连的棋子列表
-	 * @param std::set<cocos2d::Vec2> 可杀死的棋子
+	 * @return std::set<cocos2d::Vec2> 可吃掉的棋子
 	 */
-	void get_killed_chesspiece(ChessPieceType key, const std::vector<cocos2d::Vec2> &chesspieces, std::set<cocos2d::Vec2> &ret) const;
+	static std::set<cocos2d::Vec2> get_killed_chesspiece(const ChessArray &checkerboard, ChessPieceType key, const std::vector<cocos2d::Vec2> &chesspieces);
 
 	/**
-	 * 检查杀死棋子
+	 * 检查可吃掉的棋子
+	 * @param ChessArray 棋牌信息
+	 * @param cocos2d::Vec2 移动过的棋子的位置
 	 */
-	std::set<cocos2d::Vec2> check_kill_chesspiece(const cocos2d::Vec2 &pos) const;
+	static std::set<cocos2d::Vec2> check_kill_chesspiece(const ChessArray &checkerboard, const cocos2d::Vec2 &pos);
 
 private:
-	unsigned int															hander_num_;
-	std::function<void()>													even_update_;
-	std::queue<EventDetails>												event_queue_;
-	std::array<ChessPieceType, kCheckerboardRowNum * kCheckerboardColNum>	checkerboard_;
+	unsigned int				hander_num_;
+	std::function<void()>		even_update_;
+	std::queue<EventDetails>	event_queue_;
+	ChessArray					checkerboard_;
 };
 
 #endif

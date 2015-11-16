@@ -266,7 +266,7 @@ void CheckerboardLayer::perform_action()
 			if (action.type == GameLogic::EventType::MOVED)
 			{
 				action_lock_ = true;
-				if (action.chesspiece != get_chesspiece_type())
+				if (action.chess_type != get_chesspiece_type())
 				{
 					on_move_chesspiece(action.source, action.target);
 				}

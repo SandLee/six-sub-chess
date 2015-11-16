@@ -6,6 +6,9 @@ class SimpleRobot
 public:
 	SimpleRobot();
 	~SimpleRobot();
+
+public:
+	void OnMoveChess();
 };
 
 #endif
