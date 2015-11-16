@@ -1,6 +1,6 @@
 ﻿#include "HelloWorldScene.h"
 #include "CheckerboardLayer.h"
-#include "CoreLogic.h"
+#include "GameLogic.h"
 
 USING_NS_CC;
 
@@ -29,9 +29,9 @@ bool HelloWorld::init()
         return false;
     }
 
-	CoreLogic::instance();
+	GameLogic::instance();
 
-	auto p = CheckerboardLayer::create(CoreLogic::BLACK);
+	auto p = CheckerboardLayer::create(GameLogic::BLACK);
 	addChild(p);
     
     return true;

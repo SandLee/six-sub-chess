@@ -2,7 +2,7 @@
 #define __CHECKERBOARD_H__
 
 #include <array>
-#include "CoreLogic.h"
+#include "GameLogic.h"
 
 
 class CheckerboardLayer : public cocos2d::Layer
@@ -11,16 +11,16 @@ public:
 	static const int kInterval = 5;					// 棋盘间距
 	static const int kChessPieceWidth = 120;		// 棋子宽度
 	static const int kChessPieceHeight = 120;		// 棋子高度
-	static const int kChessspieceSum = CoreLogic::kCheckerboardRowNum * CoreLogic::kCheckerboardColNum;
+	static const int kChessspieceSum = GameLogic::kCheckerboardRowNum * GameLogic::kCheckerboardColNum;
 
 public:
-	CheckerboardLayer(CoreLogic::ChessPieceType type);
+	CheckerboardLayer(GameLogic::ChessPieceType type);
 
 	~CheckerboardLayer();
 
 	virtual bool init() override;
 
-	static CheckerboardLayer* create(CoreLogic::ChessPieceType type);
+	static CheckerboardLayer* create(GameLogic::ChessPieceType type);
 
 public:
 	/**
@@ -36,7 +36,7 @@ public:
 	/**
 	 * 获取棋子类型
 	 */
-	CoreLogic::ChessPieceType get_chesspiece_type() const;
+	GameLogic::ChessPieceType get_chesspiece_type() const;
 
 	/**
 	 * 棋盘坐标转换到世界坐标
@@ -96,7 +96,7 @@ private:
 
 private:
 	bool												action_lock_;
-	CoreLogic::ChessPieceType							chesspiece_type_;
+	GameLogic::ChessPieceType							chesspiece_type_;
 	cocos2d::Sprite*									selected_chesspiece_;
 	cocos2d::Vec2										touch_begin_pos_;
 	std::vector<cocos2d::Sprite *>						free_sprite_;

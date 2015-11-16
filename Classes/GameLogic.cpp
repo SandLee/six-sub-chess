@@ -1,11 +1,11 @@
-﻿#include "CoreLogic.h"
+﻿#include "GameLogic.h"
 
 #include <numeric>
 #include "json/document.h"
 using namespace cocos2d;
 
 
-CoreLogic::CoreLogic()
+GameLogic::GameLogic()
 	: hander_num_(0)
 {
 	init_checkerboard();
@@ -14,14 +14,14 @@ CoreLogic::CoreLogic()
 	Director::getInstance()->getScheduler()->scheduleUpdate(this, 0, false);
 }
 
-CoreLogic::~CoreLogic()
+GameLogic::~GameLogic()
 {
 	// 关闭定时器
 	Director::getInstance()->getScheduler()->unscheduleUpdate(this);
 }
 
 // 初始化棋盘
-void CoreLogic::init_checkerboard()
+void GameLogic::init_checkerboard()
 {
 	Data data = FileUtils::getInstance()->getDataFromFile("config/init.json");
 
@@ -49,7 +49,7 @@ void CoreLogic::init_checkerboard()
 }
 
 // 浏览棋盘
-void CoreLogic::visit_checkerboard(const std::function<void(const cocos2d::Vec2 &, int value)> &func)
+void GameLogic::visit_checkerboard(const std::function<void(const cocos2d::Vec2 &, int value)> &func)
 {
 	if (func != nullptr)
 	{
@@ -63,13 +63,13 @@ void CoreLogic::visit_checkerboard(const std::function<void(const cocos2d::Vec2 
 }
 
 // 添加事件更新通知
-void CoreLogic::add_event_update_notice(std::function<void()> &&func)
+void GameLogic::add_event_update_notice(std::function<void()> &&func)
 {
 	even_update_ = func;
 }
 
 // 取出事件信息
-CoreLogic::EventDetails CoreLogic::take_event_info()
+GameLogic::EventDetails GameLogic::take_event_info()
 {
 	EventDetails ret;
 	ret.chesspiece = 0;
@@ -83,35 +83,35 @@ CoreLogic::EventDetails CoreLogic::take_event_info()
 }
 
 // 是否在棋盘
-bool CoreLogic::is_in_checkerboard(const Vec2 &pos) const
+bool GameLogic::is_in_checkerboard(const Vec2 &pos) const
 {
 	return pos.x >= 0 && pos.y >= 0 && pos.x < kCheckerboardColNum && pos.y < kCheckerboardRowNum;
 }
 
 // 棋子是否有效
-bool CoreLogic::is_valid_chess_piece(const Vec2 &pos) const
+bool GameLogic::is_valid_chess_piece(const Vec2 &pos) const
 {
 	return is_in_checkerboard(pos) && checkerboard_[pos.y  * kCheckerboardRowNum + pos.x] != ChessPieceType::NONE;
 }
 
 // 获取棋子类型
-CoreLogic::ChessPieceType CoreLogic::get_chesspiece_type(const Vec2 &pos) const
+GameLogic::ChessPieceType GameLogic::get_chesspiece_type(const Vec2 &pos) const
 {
 	if (!is_valid_chess_piece(pos))
 	{
-		return CoreLogic::NONE;
+		return GameLogic::NONE;
 	}
 	return checkerboard_[pos.y  * kCheckerboardRowNum + pos.x];
 }
 
 // 是否相邻
-bool CoreLogic::is_adjacent(const Vec2 &a, const Vec2 &b) const
+bool GameLogic::is_adjacent(const Vec2 &a, const Vec2 &b) const
 {
 	return is_in_checkerboard(a) && is_in_checkerboard(a) && (abs(b.x - a.x) + abs(b.y - a.y) == 1);
 }
 
 // 移动棋子
-bool CoreLogic::move_chess_piece(const Vec2 &source, const Vec2 &target)
+bool GameLogic::move_chess_piece(const Vec2 &source, const Vec2 &target)
 {
 	if (source != target)
 	{
@@ -147,7 +147,7 @@ bool CoreLogic::move_chess_piece(const Vec2 &source, const Vec2 &target)
 }
 
 // 定时器更新
-void CoreLogic::update(float dt)
+void GameLogic::update(float dt)
 {
 	while (hander_num_ > 0)
 	{
@@ -160,7 +160,7 @@ void CoreLogic::update(float dt)
 }
 
 // 获取横向相连的棋子
-std::vector<Vec2> CoreLogic::get_chesspieces_with_horizontal(const Vec2 &pos) const
+std::vector<Vec2> GameLogic::get_chesspieces_with_horizontal(const Vec2 &pos) const
 {
 	int continuous = 0;
 	std::vector<Vec2> ret;
@@ -196,7 +196,7 @@ std::vector<Vec2> CoreLogic::get_chesspieces_with_horizontal(const Vec2 &pos) co
 }
 
 // 获取纵向相连的棋子
-std::vector<Vec2> CoreLogic::get_chesspieces_with_vertical(const Vec2 &pos) const
+std::vector<Vec2> GameLogic::get_chesspieces_with_vertical(const Vec2 &pos) const
 {
 	int continuous = 0;
 	std::vector<Vec2> ret;
@@ -232,7 +232,7 @@ std::vector<Vec2> CoreLogic::get_chesspieces_with_vertical(const Vec2 &pos) cons
 }
 
 // 获取可杀死的棋子
-void CoreLogic::get_killed_chesspiece(ChessPieceType key, const std::vector<cocos2d::Vec2> &chesspieces, std::set<cocos2d::Vec2> &ret) const
+void GameLogic::get_killed_chesspiece(ChessPieceType key, const std::vector<cocos2d::Vec2> &chesspieces, std::set<cocos2d::Vec2> &ret) const
 {
 	if (chesspieces.size() == 3)
 	{
@@ -260,7 +260,7 @@ void CoreLogic::get_killed_chesspiece(ChessPieceType key, const std::vector<coco
 }
 
 // 检查杀死棋子
-std::set<Vec2> CoreLogic::check_kill_chesspiece(const Vec2 &pos) const
+std::set<Vec2> GameLogic::check_kill_chesspiece(const Vec2 &pos) const
 {
 	std::set<Vec2> killed_set;
 	if (!is_valid_chess_piece(pos))

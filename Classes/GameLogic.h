@@ -9,9 +9,9 @@
 #include "Singleton.h"
 
 
-class CoreLogic : public Singleton<CoreLogic>
+class GameLogic : public Singleton<GameLogic>
 {
-	SINGLETON(CoreLogic);
+	SINGLETON(GameLogic);
 
 public:
 	enum ChessPieceType
@@ -74,7 +74,7 @@ public:
 	/**
 	 * 获取棋子类型
 	 */
-	CoreLogic::ChessPieceType get_chesspiece_type(const cocos2d::Vec2 &pos) const;
+	GameLogic::ChessPieceType get_chesspiece_type(const cocos2d::Vec2 &pos) const;
 
 	/**
 	 * 是否相邻
