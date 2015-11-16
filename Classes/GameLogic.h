@@ -85,6 +85,11 @@ public:
 	Action take_action_from_queue();
 
 	/**
+	 * 清理动作更新回调
+	 */
+	void clear_action_update_callback();
+
+	/**
 	 * 添加动作更新回调
 	 */
 	void add_action_update_callback(std::function<void()> &&callback);
@@ -166,10 +171,11 @@ private:
 	void add_action(ActionType type, ChessPieceType chess_type, const Vec2 &source, const Vec2 &target);
 
 private:
-	bool					lock_;
-	std::function<void()>	action_callback_;
-	std::queue<Action>		action_queue_;
-	ChessArray				checkerboard_;
+	bool								lock_;
+	ChessPieceType						standby_type_;
+	std::queue<Action>					action_queue_;
+	ChessArray							checkerboard_;
+	std::vector<std::function<void()>>	action_callback_list_;
 };
 
 #endif

@@ -4,6 +4,7 @@
 GameLogic::GameLogic(const ChessArray &checkerboard)
 	: lock_(false)
 	, checkerboard_(checkerboard)
+	, standby_type_(ChessPieceType::BLACK)
 {
 
 }
@@ -27,10 +28,21 @@ GameLogic::Action GameLogic::take_action_from_queue()
 	return action;
 }
 
+// 清理动作更新回调
+void GameLogic::clear_action_update_callback()
+{
+	action_callback_list_.clear();
+}
+
 // 添加动作更新通知
 void GameLogic::add_action_update_callback(std::function<void()> &&callback)
 {
-	action_callback_ = callback;
+	assert(callback != nullptr);
+	if (callback != nullptr)
+	{
+		action_callback_list_.push_back(callback);
+		add_action(ActionType::STANDBY, standby_type_, Vec2(), Vec2());
+	}
 }
 
 // 获取棋盘数据
@@ -62,10 +74,9 @@ void GameLogic::add_action(ActionType type, ChessPieceType chess_type, const Vec
 	action.target = target;
 	action.chess_type = chess_type;
 	action_queue_.push(action);
-
-	if (action_callback_ != nullptr)
+	for (auto &func : action_callback_list_)
 	{
-		action_callback_();
+		func();
 	}
 }
 
@@ -118,9 +129,8 @@ bool GameLogic::move_chess_piece(const Vec2 &source, const Vec2 &target)
 			}
 
 			// 玩家待机
-			ChessPieceType type = checkerboard_[target.y  * kCheckerboardRowNum + target.x];
-			type = type == ChessPieceType::WHITE ? ChessPieceType::BLACK : ChessPieceType::WHITE;
-			add_action(ActionType::STANDBY, type, Vec2(), Vec2());
+			standby_type_ = checkerboard_[target.y  * kCheckerboardRowNum + target.x];
+			add_action(ActionType::STANDBY, standby_type_, Vec2(), Vec2());
 
 			lock_ = false;
 			return true;
