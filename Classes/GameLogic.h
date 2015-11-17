@@ -29,6 +29,7 @@ public:
 		MOVED,										// 移动
 		KILLED,										// 杀棋
 		STANDBY,									// 待机
+		GAMEOVER,									// 游戏结束
 	};
 
 	/**
@@ -181,6 +182,11 @@ protected:
 	GameLogic& operator= (const GameLogic&) = delete;
 
 private:
+	/**
+	 * 获取所有可行的移动路径
+	 */
+	std::vector<MoveTrack> get_all_movetrack(ChessPieceType type) const;
+
 	/**
 	 * 添加动作
 	 */

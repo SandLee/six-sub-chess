@@ -135,9 +135,36 @@ void GameLogic::update(float dt)
 				add_action(ActionType::KILLED, ChessPieceType::NONE, target, pos);
 			}
 
-			// 玩家待机
+			// 是否无棋可用
+			int count = 0;
 			standby_type_ = checkerboard_[target.y  * kCheckerboardRowNum + target.x];
-			add_action(ActionType::STANDBY, standby_type_, Vec2(), Vec2());
+			auto other_chess_type = standby_type_ == ChessPieceType::WHITE ? ChessPieceType::BLACK : ChessPieceType::WHITE;
+			for (size_t i = 0; i < checkerboard_.size(); ++i)
+			{
+				if (checkerboard_[i] == other_chess_type)
+				{
+					++count;
+				}
+			}
+
+			// 游戏是否结束
+			if (count <= 1)
+			{
+				add_action(ActionType::GAMEOVER, other_chess_type, Vec2(), Vec2());
+			}
+			else
+			{
+				// 玩家待机	
+				if (!get_all_movetrack(standby_type_).empty())
+				{
+					add_action(ActionType::STANDBY, standby_type_, Vec2(), Vec2());
+				}
+				else
+				{
+					// 山穷水尽
+					add_action(ActionType::GAMEOVER, other_chess_type, Vec2(), Vec2());
+				}
+			}
 		}
 
 		move_queue_.pop();
@@ -257,4 +284,37 @@ std::set<GameLogic::Vec2> GameLogic::check_kill_chesspiece(const ChessArray &che
 	auto vertical_set = GameLogic::get_killed_chesspiece(checkerboard, key, v_array);
 	horizontal_set.insert(vertical_set.begin(), vertical_set.end());
 	return horizontal_set;
+}
+
+// 获取所有可行的移动路径
+std::vector<GameLogic::MoveTrack> GameLogic::get_all_movetrack(ChessPieceType type) const
+{
+	size_t idx = 0;
+	std::vector<GameLogic::MoveTrack> track_array;
+	while (idx != checkerboard_.size())
+	{
+		if (checkerboard_[idx] == type)
+		{
+			// 判断上下左右是否可移动
+			int row = idx / GameLogic::kCheckerboardColNum;
+			int col = idx % GameLogic::kCheckerboardColNum;
+			for (int i = -1; i <= 1; i += 2)
+			{
+				GameLogic::Vec2 v1(col + i, row);
+				GameLogic::Vec2 v2(col, row + i);
+				if (is_in_checkerboard(v1) && !is_valid_chess_piece(v1))
+				{
+					GameLogic::MoveTrack track = { GameLogic::Vec2(col, row), v1 };
+					track_array.push_back(track);
+				}
+				if (is_in_checkerboard(v2) && !is_valid_chess_piece(v2))
+				{
+					GameLogic::MoveTrack track = { GameLogic::Vec2(col, row), v2 };
+					track_array.push_back(track);
+				}
+			}
+		}
+		++idx;
+	}
+	return track_array;
 }
