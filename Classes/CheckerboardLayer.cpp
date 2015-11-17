@@ -1,24 +1,12 @@
 ﻿#include "CheckerboardLayer.h"
 
-#include <random>
 #include "VisibleRect.h"
+#include "ColorGenerator.h"
 using namespace cocos2d;
 
 
 namespace
 {
-	// 七色
-	static std::vector<Color4B> g_seven_colors =
-	{
-		Color4B(255, 0, 0, 255),
-		Color4B(255, 165, 0, 255),
-		Color4B(255, 255, 0, 255),
-		Color4B(0, 128, 0, 255),
-		Color4B(0, 255, 255, 255),
-		Color4B(0, 0, 255, 255),
-		Color4B(79, 47, 79, 255)
-	};
-
 	// 棋子正常显示层级
 	const int kNormalChessPieceZOrder = 1;
 
@@ -66,8 +54,8 @@ bool CheckerboardLayer::init()
 	Vec2 start_pos = get_chesspiece_start_pos();
 	for (size_t i = 0; i < color_floor_.size(); ++i)
 	{
-		int row = i / GameLogic::kCheckerboardRowNum;
-		int col = i % GameLogic::kCheckerboardRowNum;
+		int row = i / GameLogic::kCheckerboardColNum;
+		int col = i % GameLogic::kCheckerboardColNum;
 		auto layer = LayerColor::create();
 		layer->setContentSize(Size(kChessPieceWidth, kChessPieceHeight));
 		layer->setPosition(start_pos + Vec2(col * kChessPieceWidth + col * kInterval, row * kChessPieceHeight + row * kInterval));
@@ -75,10 +63,7 @@ bool CheckerboardLayer::init()
 		addChild(layer);
 	}
 
-	std::default_random_engine generator(time(nullptr));
-	std::uniform_int_distribution<int> dis(0, g_seven_colors.size() - 1);
-	const Color4B color = g_seven_colors[dis(generator)];
-
+	const Color4B color(ColorGenerator::instance()->rand());
 	for (size_t i = 0; i < color_floor_.size(); ++i)
 	{
 		int index = (i % GameLogic::kCheckerboardRowNum) % 2;
