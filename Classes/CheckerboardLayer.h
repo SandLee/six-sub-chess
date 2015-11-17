@@ -102,6 +102,7 @@ private:
 private:
 	GameLogic*											logic_;
 	bool												action_lock_;
+	bool												operation_lock_;
 	GameLogic::ChessPieceType							chesspiece_type_;
 	cocos2d::Sprite*									selected_chesspiece_;
 	cocos2d::Vec2										touch_begin_pos_;

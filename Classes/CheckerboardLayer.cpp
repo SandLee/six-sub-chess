@@ -39,6 +39,7 @@ namespace
 CheckerboardLayer::CheckerboardLayer()
 	: logic_(nullptr)
 	, action_lock_(false)
+	, operation_lock_(true)
 	, selected_chesspiece_(nullptr)
 	, chesspiece_type_(GameLogic::ChessPieceType::NONE)
 {
@@ -273,10 +274,12 @@ void CheckerboardLayer::perform_action()
 		GameLogic::Action action = logic_->take_action_from_queue();
 		if (action.type != GameLogic::ActionType::NONE)
 		{
-			// 移动，自己的移动操作实时处理，不通过逻辑处理器进行
+			action_lock_ = true;
+
+			// 移动
 			if (action.type == GameLogic::ActionType::MOVED)
 			{
-				action_lock_ = true;
+				// 自己的移动操作实时处理，不通过逻辑处理器进行
 				if (action.chess_type != get_chesspiece_type())
 				{
 					on_move_chesspiece(ToCocos2DVec2(action.source), ToCocos2DVec2(action.target));
@@ -289,8 +292,13 @@ void CheckerboardLayer::perform_action()
 			// 吃子
 			else if (action.type == GameLogic::ActionType::KILLED)
 			{
-				action_lock_ = true;
 				on_kill_chesspiece(ToCocos2DVec2(action.source), ToCocos2DVec2(action.target));
+			}
+			// 待机
+			else if (action.type == GameLogic::ActionType::STANDBY)
+			{
+				operation_lock_ = action.chess_type == get_chesspiece_type();
+				runAction(Sequence::create(CallFunc::create(std::bind(&CheckerboardLayer::finished_action, this)), nullptr));
 			}
 		}
 	}
@@ -305,7 +313,7 @@ void CheckerboardLayer::finished_action()
 
 bool CheckerboardLayer::onTouchBegan(Touch *touch, Event *unused_event)
 {
-	if (has_logic() && !action_lock_)
+	if (has_logic() && !action_lock_ && !operation_lock_)
 	{
 		Vec2 chesspiece_pos = convert_to_checkerboard_space(touch->getLocation());
 		if (logic_->get_chesspiece_type(ToCheckerboardVec2(chesspiece_pos)) == get_chesspiece_type())
@@ -327,7 +335,7 @@ void CheckerboardLayer::onTouchMoved(Touch *touch, Event *unused_event)
 {
 	// 移动棋子
 	assert(selected_chesspiece_ != nullptr);
-	if (selected_chesspiece_ != nullptr)
+	if (selected_chesspiece_ != nullptr )
 	{
 		selected_chesspiece_->setPosition(touch->getLocation());
 	}
@@ -341,7 +349,8 @@ void CheckerboardLayer::onTouchEnded(Touch *touch, Event *unused_event)
 		auto target = convert_to_checkerboard_space(touch->getLocation());
 
 		if (logic_->is_adjacent(ToCheckerboardVec2(source), ToCheckerboardVec2(target)) &&
-			!logic_->is_valid_chess_piece(ToCheckerboardVec2(target)))
+			!logic_->is_valid_chess_piece(ToCheckerboardVec2(target)) &&
+			!operation_lock_)
 		{
 			selected_chesspiece_->setPosition(convert_to_world_space(target));
 			logic_->move_chess_piece(ToCheckerboardVec2(source), ToCheckerboardVec2(target));
