@@ -1,16 +1,12 @@
-﻿#include "HelloWorldScene.h"
-#include "CheckerboardLayer.h"
-#include "GameLogic.h"
-
-USING_NS_CC;
-
-
-#include "GameLogic.h"
+﻿#include "GameScene.h"
 
 #include <numeric>
+#include "GameLogic.h"
+#include "SimpleRobot.h"
 #include "json/document.h"
-using namespace cocos2d;
+#include "CheckerboardLayer.h"
 
+using namespace cocos2d;
 
 
 // 初始化棋盘
@@ -39,47 +35,42 @@ void InitCheckerboard(GameLogic::ChessArray &checkerboard)
 	}
 }
 
-Scene* HelloWorld::createScene()
+Scene* GameScene::createScene()
 {
-    // 'scene' is an autorelease object
     auto scene = Scene::create();
-    
-    // 'layer' is an autorelease object
-    auto layer = HelloWorld::create();
-
-    // add layer as a child to scene
+	auto layer = GameScene::create();
     scene->addChild(layer);
-
-    // return the scene
     return scene;
 }
 
-// on "init" you need to initialize your instance
-bool HelloWorld::init()
+bool GameScene::init()
 {
-    //////////////////////////////
-    // 1. super init first
     if ( !Layer::init() )
     {
         return false;
     }
 
+	// 初始化棋盘
 	GameLogic::ChessArray checkerboard;
 	InitCheckerboard(checkerboard);
-	GameLogic *logic = new GameLogic(checkerboard); // 测试
-	auto p = CheckerboardLayer::create();
-	p->generate_chessboard(GameLogic::ChessPieceType::WHITE, logic);
-	addChild(p);
-    
+
+	logic_.reset(new GameLogic(checkerboard));
+	robot_.reset(new SimpleRobot(GameLogic::ChessPieceType::BLACK, logic_.get()));
+
+	// 操作图层
+	auto layer = CheckerboardLayer::create();
+	layer->generate_chessboard(GameLogic::ChessPieceType::WHITE, logic_.get());
+	addChild(layer);
+
+	scheduleUpdate();
+
     return true;
 }
 
-
-void HelloWorld::menuCloseCallback(Ref* pSender)
+void GameScene::update(float delta)
 {
-    Director::getInstance()->end();
-
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-    exit(0);
-#endif
+	if (logic_.get())
+	{
+		logic_->update(delta);
+	}
 }

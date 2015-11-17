@@ -27,7 +27,7 @@ public:
 	{
 		NONE,
 		MOVED,										// 移动
-		KILLED,										// 吃子
+		KILLED,										// 杀棋
 		STANDBY,									// 待机
 	};
 
@@ -58,6 +58,17 @@ public:
 		}
 	};
 
+	struct MoveTrack
+	{
+		GameLogic::Vec2 source;
+		GameLogic::Vec2 target;
+
+		bool operator== (const MoveTrack &that) const
+		{
+			return source == that.source && target == that.target;
+		}
+	};
+
 	/**
 	 * 动作信息
 	 */
@@ -80,14 +91,14 @@ public:
 	~GameLogic();
 
 	/**
-	 * 取出动作信息
+	 * 清理
 	 */
-	Action take_action_from_queue();
+	void clear();
 
 	/**
-	 * 清理动作更新回调
+	 * 获取动作信息
 	 */
-	void clear_action_update_callback();
+	Action get_action_from_queue(size_t index);
 
 	/**
 	 * 添加动作更新回调
@@ -127,7 +138,12 @@ public:
 	/**
 	 * 移动棋子
 	 */
-	bool move_chess_piece(const Vec2 &source, const Vec2 &target);
+	void move_chess_piece(const Vec2 &source, const Vec2 &target);
+
+	/**
+	 * 更新
+	 */
+	void update(float dt);
 
 public:
 	/**
@@ -171,9 +187,9 @@ private:
 	void add_action(ActionType type, ChessPieceType chess_type, const Vec2 &source, const Vec2 &target);
 
 private:
-	bool								lock_;
 	ChessPieceType						standby_type_;
-	std::queue<Action>					action_queue_;
+	std::queue<MoveTrack>				move_queue_;
+	std::vector<Action>					action_queue_;
 	ChessArray							checkerboard_;
 	std::vector<std::function<void()>>	action_callback_list_;
 };

@@ -61,12 +61,12 @@ public:
 	/**
 	 * 执行动作
 	 */
-	void perform_action();
+	void run_action();
 
 	/**
 	 * 完成动作
 	 */
-	void finished_action();
+	void action_finished();
 
 public:
 	virtual bool onTouchBegan(cocos2d::Touch *touch, cocos2d::Event *unused_event) override;
@@ -103,6 +103,7 @@ private:
 	GameLogic*											logic_;
 	bool												action_lock_;
 	bool												operation_lock_;
+	int													action_read_pos_;
 	GameLogic::ChessPieceType							chesspiece_type_;
 	cocos2d::Sprite*									selected_chesspiece_;
 	cocos2d::Vec2										touch_begin_pos_;

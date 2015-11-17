@@ -39,6 +39,7 @@ namespace
 CheckerboardLayer::CheckerboardLayer()
 	: logic_(nullptr)
 	, action_lock_(false)
+	, action_read_pos_(0)
 	, operation_lock_(true)
 	, selected_chesspiece_(nullptr)
 	, chesspiece_type_(GameLogic::ChessPieceType::NONE)
@@ -235,7 +236,7 @@ void CheckerboardLayer::on_move_chesspiece(const Vec2 &source, const Vec2 &targe
 			int t_index = target.y * GameLogic::kCheckerboardColNum + target.x;
 			std::swap(chesspiece_sprite_[s_index], chesspiece_sprite_[t_index]);
 		}),
-			CallFunc::create(std::bind(&CheckerboardLayer::finished_action, this)),
+			CallFunc::create(std::bind(&CheckerboardLayer::action_finished, this)),
 			nullptr));
 	}
 }
@@ -255,7 +256,7 @@ void CheckerboardLayer::on_kill_chesspiece(const Vec2 &source, const Vec2 &targe
 			free_sprite_.push_back(chesspiece_sprite_[index]);
 			chesspiece_sprite_[index] = nullptr;
 		}),
-			CallFunc::create(std::bind(&CheckerboardLayer::finished_action, this)),
+			CallFunc::create(std::bind(&CheckerboardLayer::action_finished, this)),
 			nullptr));
 	}
 }
@@ -263,15 +264,15 @@ void CheckerboardLayer::on_kill_chesspiece(const Vec2 &source, const Vec2 &targe
 // 更新动作
 void CheckerboardLayer::update_action()
 {
-	perform_action();
+	run_action();
 }
 
 // 执行动作
-void CheckerboardLayer::perform_action()
+void CheckerboardLayer::run_action()
 {
 	if (!action_lock_ && has_logic())
 	{
-		GameLogic::Action action = logic_->take_action_from_queue();
+		GameLogic::Action action = logic_->get_action_from_queue(action_read_pos_);
 		if (action.type != GameLogic::ActionType::NONE)
 		{
 			action_lock_ = true;
@@ -286,10 +287,10 @@ void CheckerboardLayer::perform_action()
 				}
 				else
 				{
-					runAction(Sequence::create(CallFunc::create(std::bind(&CheckerboardLayer::finished_action, this)), nullptr));
+					runAction(Sequence::create(CallFunc::create(std::bind(&CheckerboardLayer::action_finished, this)), nullptr));
 				}
 			}
-			// 吃子
+			// 杀棋
 			else if (action.type == GameLogic::ActionType::KILLED)
 			{
 				on_kill_chesspiece(ToCocos2DVec2(action.source), ToCocos2DVec2(action.target));
@@ -298,17 +299,18 @@ void CheckerboardLayer::perform_action()
 			else if (action.type == GameLogic::ActionType::STANDBY)
 			{
 				operation_lock_ = action.chess_type == get_chesspiece_type();
-				runAction(Sequence::create(CallFunc::create(std::bind(&CheckerboardLayer::finished_action, this)), nullptr));
+				runAction(Sequence::create(CallFunc::create(std::bind(&CheckerboardLayer::action_finished, this)), nullptr));
 			}
 		}
 	}
 }
 
 // 完成动作
-void CheckerboardLayer::finished_action()
+void CheckerboardLayer::action_finished()
 {
+	++action_read_pos_;
 	action_lock_ = false;
-	perform_action();
+	run_action();
 }
 
 bool CheckerboardLayer::onTouchBegan(Touch *touch, Event *unused_event)
