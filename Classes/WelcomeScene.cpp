@@ -49,6 +49,7 @@ bool WelcomeScene::init()
 	Vec2 start_pos;
 	std::array<MenuItemType, 4> tags = { SingleGame, OnlineGame, About, QuitGame };
 	std::array<const char*, 4> menu_texts = { "single_game", "online_game", "about", "quit_game" };
+	auto yyy = VisibleRect::center().y;
 	start_pos.x = VisibleRect::center().x - (kMenuItemWidth * kMenuColNum + kMenuItemInterval * (kMenuColNum - 1)) / 2 + kMenuItemWidth / 2;
 	start_pos.y = VisibleRect::center().y + (kMenuItemHeight * kMenuRowNum + kMenuItemInterval * (kMenuRowNum - 1)) / 2 - kMenuItemHeight / 2;
 	std::vector<cocos2d::Color3B> colors = ColorGenerator::instance()->rand_not_repeat(5);
