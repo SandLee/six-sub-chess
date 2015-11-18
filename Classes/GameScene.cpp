@@ -1,8 +1,6 @@
 ﻿#include "GameScene.h"
 
 #include <numeric>
-#include "GameLogic.h"
-#include "SimpleRobot.h"
 #include "json/document.h"
 #include "CheckerboardLayer.h"
 
@@ -54,13 +52,15 @@ bool GameScene::init()
 	GameLogic::ChessArray checkerboard;
 	InitCheckerboard(checkerboard);
 
-	logic_.reset(new GameLogic(checkerboard));
-	robot_.reset(new SimpleRobot(GameLogic::ChessPieceType::BLACK, logic_.get()));
+	// 创建菜单
+
 
 	// 操作图层
+	logic_.reset(new GameLogic(checkerboard));
+	robot_.reset(new SimpleRobot(GameLogic::ChessPieceType::BLACK, logic_.get()));
 	auto layer = CheckerboardLayer::create();
 	layer->generate_chessboard(GameLogic::ChessPieceType::WHITE, logic_.get());
-	addChild(layer);
+	addChild(layer, 1);
 
 	scheduleUpdate();
 

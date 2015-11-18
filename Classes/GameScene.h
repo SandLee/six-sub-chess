@@ -2,9 +2,8 @@
 #define __GAMESCENE_H__
 
 #include "cocos2d.h"
-
-class GameLogic;
-class SimpleRobot;
+#include "GameLogic.h"
+#include "SimpleRobot.h"
 
 class GameScene : public cocos2d::Layer
 {

@@ -1,6 +1,14 @@
 {
-    "single_game": "单人游戏",
-    "online_game": "联机对战",
-    "about": "关于",
-    "quit_game": "退出游戏"
+    "english": {
+        "single_game": "Single Game",
+        "online_game": "Online Game",
+        "about": "About",
+        "quit_game": "Quit Game"
+    },
+    "chinese": {
+        "single_game": "单人游戏",
+        "online_game": "联机对战",
+        "about": "关于",
+        "quit_game": "退出游戏"
+    }
 }
