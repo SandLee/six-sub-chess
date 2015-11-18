@@ -56,21 +56,21 @@ bool WelcomeScene::init()
 	{
 		int row = i / kMenuColNum;
 		int col = i % kMenuColNum;
-		auto layer = LayerColor::create();
-		layer->setAnchorPoint(Vec2(0.5f, 0.5f));
-		layer->initWithColor(Color4B(colors[i]));
-		layer->setContentSize(Size(kMenuItemWidth, kMenuItemHeight));
-		layer->ignoreAnchorPointForPosition(false);
-		layer->setPosition(start_pos + Vec2(col * kMenuItemWidth + col * kMenuItemInterval, -(row * kMenuItemHeight + row * kMenuItemInterval)));
-		layer->setTag(tags[i]);
-		addChild(layer);
+		auto menu_item = LayerColor::create();
+		menu_item->setAnchorPoint(Vec2(0.5f, 0.5f));
+		menu_item->initWithColor(Color4B(colors[i]));
+		menu_item->setContentSize(Size(kMenuItemWidth, kMenuItemHeight));
+		menu_item->ignoreAnchorPointForPosition(false);
+		menu_item->setPosition(start_pos + Vec2(col * kMenuItemWidth + col * kMenuItemInterval, -(row * kMenuItemHeight + row * kMenuItemInterval)));
+		menu_item->setTag(tags[i]);
+		addChild(menu_item);
 
-		auto size = layer->getContentSize();
+		auto size = menu_item->getContentSize();
 		auto label = Label::createWithSystemFont(lang(menu_texts[i]).c_str(), "", 32);
 		label->setColor(Color3B(0, 0, 0));
 		label->setAnchorPoint(Vec2(0.0f, 0.5f));
 		label->setPosition(Vec2(size.width / 6, size.height / 4));
-		layer->addChild(label);
+		menu_item->addChild(label);
 	}
 	initWithColor(Color4B(colors.back()));
 
@@ -81,7 +81,7 @@ bool WelcomeScene::init()
 	listener->onTouchMoved = CC_CALLBACK_2(WelcomeScene::onTouchMoved, this);
 	listener->onTouchEnded = CC_CALLBACK_2(WelcomeScene::onTouchEnded, this);
 	listener->onTouchCancelled = CC_CALLBACK_2(WelcomeScene::onTouchCancelled, this);
-	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
+	getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, this);
 
 	return true;
 }

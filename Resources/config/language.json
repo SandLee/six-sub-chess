@@ -3,12 +3,16 @@
         "single_game": "Single Game",
         "online_game": "Online Game",
         "about": "About",
-        "quit_game": "Quit Game"
+        "quit_game": "Quit Game",
+        "reset": "Reset",
+        "goto_mainmenu": "Goto Main Menu"
     },
     "chinese": {
         "single_game": "单人游戏",
         "online_game": "联机对战",
         "about": "关于",
-        "quit_game": "退出游戏"
+        "quit_game": "退出游戏",
+        "reset": "重置棋盘",
+        "goto_mainmenu": "返回主菜单"
     }
 }

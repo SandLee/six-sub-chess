@@ -2,7 +2,6 @@
 
 #include <set>
 #include <ctime>
-#include <random>
 using namespace cocos2d;
 
 
@@ -19,6 +18,7 @@ static const std::vector<Color3B> g_seven_colors =
 };
 
 ColorGenerator::ColorGenerator()
+	: generator_(time(nullptr))
 {
 
 }
@@ -31,9 +31,8 @@ ColorGenerator::~ColorGenerator()
 // 随机生成一种颜色
 Color3B ColorGenerator::rand() const
 {
-	std::default_random_engine generator(time(nullptr));
 	std::uniform_int_distribution<int> dis(0, g_seven_colors.size() - 1);
-	return g_seven_colors[dis(generator)];
+	return g_seven_colors[dis(generator_)];
 }
 
 // 最多随机生成不重复颜色的数量
@@ -54,9 +53,8 @@ std::vector<cocos2d::Color3B> ColorGenerator::rand_not_repeat(unsigned int num) 
 	std::vector<Color3B> seven_colors = g_seven_colors;
 	for (unsigned int i = 0; i < num && !seven_colors.empty(); ++i)
 	{
-		std::default_random_engine generator(time(nullptr));
 		std::uniform_int_distribution<int> dis(0, seven_colors.size() - 1);
-		std::swap(seven_colors[dis(generator)], seven_colors.back());
+		std::swap(seven_colors[dis(generator_)], seven_colors.back());
 		color_array.push_back(seven_colors.back());
 		seven_colors.pop_back();
 	}
