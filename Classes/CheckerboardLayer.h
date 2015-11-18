@@ -14,19 +14,19 @@ public:
 	static const int kChessspieceSum = GameLogic::kCheckerboardRowNum * GameLogic::kCheckerboardColNum;
 
 public:
-	CheckerboardLayer();
+	CheckerboardLayer(GameLogic *logic);
 
 	~CheckerboardLayer();
 
 	virtual bool init() override;
 
-	CREATE_FUNC(CheckerboardLayer);
+	static CheckerboardLayer* create(GameLogic *logic);
 
 public:
 	/**
-	 * 是否已设定逻辑
+	 * 重置
 	 */
-	bool has_logic() const;
+	void reset(GameLogic::ChessPieceType type);
 
 	/**
 	 * 获取棋子开始位置
@@ -37,11 +37,6 @@ public:
 	 * 获取棋子类型
 	 */
 	GameLogic::ChessPieceType get_chesspiece_type() const;
-
-	/**
-	 * 生成棋盘
-	 */
-	void generate_chessboard(GameLogic::ChessPieceType type, GameLogic *logic);
 
 	/**
 	 * 棋盘坐标转换到世界坐标
@@ -78,6 +73,11 @@ public:
 	virtual void onTouchCancelled(cocos2d::Touch *touch, cocos2d::Event *unused_event) override;
 
 private:
+	/**
+	 * 刷新棋盘
+	 */
+	void refresh_checkerboard();
+
 	/**
 	 * 棋盘坐标转视图坐标
 	 */

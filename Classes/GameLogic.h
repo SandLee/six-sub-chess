@@ -26,6 +26,7 @@ public:
 	enum class ActionType
 	{
 		NONE,
+		START,										// 开始
 		MOVED,										// 移动
 		KILLED,										// 杀棋
 		STANDBY,									// 待机
@@ -87,7 +88,7 @@ public:
 	typedef std::array<ChessPieceType, kCheckerboardRowNum * kCheckerboardColNum> ChessArray;
 
 public:
-	GameLogic(const ChessArray &checkerboard);
+	GameLogic();
 
 	~GameLogic();
 
@@ -95,6 +96,16 @@ public:
 	 * 清理
 	 */
 	void clear();
+
+	/**
+	 * 开始游戏
+	 */
+	void start(const ChessArray &checkerboard);
+
+	/**
+	 * 获取动作数量
+	 */
+	size_t get_action_num() const;
 
 	/**
 	 * 获取动作信息
@@ -193,7 +204,7 @@ private:
 	void add_action(ActionType type, ChessPieceType chess_type, const Vec2 &source, const Vec2 &target);
 
 private:
-	ChessPieceType						standby_type_;
+	ChessPieceType						standby_chess_type_;
 	std::queue<MoveTrack>				move_queue_;
 	std::vector<Action>					action_queue_;
 	ChessArray							checkerboard_;

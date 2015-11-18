@@ -5,6 +5,8 @@
 #include "GameLogic.h"
 #include "SimpleRobot.h"
 
+class CheckerboardLayer;
+
 class GameScene : public cocos2d::Layer
 {
 	static const int kMenuItemInterval = 5;		// 子菜单间距
@@ -32,13 +34,19 @@ public:
 	virtual void onTouchCancelled(cocos2d::Touch *touch, cocos2d::Event *unused_event) override;
 
 private:
+	void start_game();
+
 	virtual void update(float delta) override;
 
+	virtual void onEnterTransitionDidFinish() override;
+
 private:
-	Layer* menu_layer_;
-	cocos2d::Node* selected_item_;
-	std::auto_ptr<GameLogic> logic_;
-	std::auto_ptr<SimpleRobot> robot_;
+	Layer*						menu_layer_;
+	CheckerboardLayer*			player_;
+	cocos2d::Label*				banner_;
+	cocos2d::Node*				selected_item_;
+	std::auto_ptr<GameLogic>	logic_;
+	std::auto_ptr<SimpleRobot>	robot_;
 };
 
 #endif

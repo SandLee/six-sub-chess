@@ -1,11 +1,13 @@
 ﻿#include "GameLogic.h"
 #include <cassert>
 
-GameLogic::GameLogic(const ChessArray &checkerboard)
-	: checkerboard_(checkerboard)
-	, standby_type_(ChessPieceType::BLACK)
+GameLogic::GameLogic()
+	: standby_chess_type_(ChessPieceType::BLACK)
 {
-
+	for (size_t i = 0; i < checkerboard_.size(); ++i)
+	{
+		checkerboard_[i] = ChessPieceType::NONE;
+	}
 }
 
 GameLogic::~GameLogic()
@@ -17,7 +19,26 @@ GameLogic::~GameLogic()
 void GameLogic::clear()
 {
 	action_queue_.clear();
-	action_callback_list_.clear();
+	for (size_t i = 0; i < checkerboard_.size(); ++i)
+	{
+		checkerboard_[i] = ChessPieceType::NONE;
+	}
+}
+
+// 开始游戏
+void GameLogic::start(const ChessArray &checkerboard)
+{
+	clear();
+	checkerboard_ = checkerboard;
+	standby_chess_type_ = ChessPieceType::BLACK;
+	add_action(ActionType::START, standby_chess_type_, Vec2(), Vec2());
+	add_action(ActionType::STANDBY, standby_chess_type_, Vec2(), Vec2());
+}
+
+// 获取动作数量
+size_t GameLogic::get_action_num() const
+{
+	return action_queue_.size();
 }
 
 // 取出动作信息
@@ -40,7 +61,6 @@ void GameLogic::add_action_update_callback(std::function<void()> &&callback)
 	if (callback != nullptr)
 	{
 		action_callback_list_.push_back(callback);
-		add_action(ActionType::STANDBY, standby_type_, Vec2(), Vec2());
 	}
 }
 
@@ -119,7 +139,7 @@ void GameLogic::update(float dt)
 		const Vec2 &target = move_queue_.front().target;
 
 		if (source != target && is_valid_chess_piece(source) && !is_valid_chess_piece(target)
-			&& is_adjacent(source, target) && checkerboard_[target.y  * kCheckerboardRowNum + target.x] != standby_type_)
+			&& is_adjacent(source, target) && checkerboard_[target.y  * kCheckerboardRowNum + target.x] != standby_chess_type_)
 		{
 			// 交换数据
 			std::swap(checkerboard_[source.y  * kCheckerboardRowNum + source.x], checkerboard_[target.y  * kCheckerboardRowNum + target.x]);
@@ -137,8 +157,8 @@ void GameLogic::update(float dt)
 
 			// 是否无棋可用
 			int count = 0;
-			standby_type_ = checkerboard_[target.y  * kCheckerboardRowNum + target.x];
-			auto other_chess_type = standby_type_ == ChessPieceType::WHITE ? ChessPieceType::BLACK : ChessPieceType::WHITE;
+			standby_chess_type_ = checkerboard_[target.y  * kCheckerboardRowNum + target.x];
+			auto other_chess_type = standby_chess_type_ == ChessPieceType::WHITE ? ChessPieceType::BLACK : ChessPieceType::WHITE;
 			for (size_t i = 0; i < checkerboard_.size(); ++i)
 			{
 				if (checkerboard_[i] == other_chess_type)
@@ -150,19 +170,19 @@ void GameLogic::update(float dt)
 			// 游戏是否结束
 			if (count <= 1)
 			{
-				add_action(ActionType::GAMEOVER, other_chess_type, Vec2(), Vec2());
+				add_action(ActionType::GAMEOVER, standby_chess_type_, Vec2(), Vec2());
 			}
 			else
 			{
 				// 玩家待机	
-				if (!get_all_movetrack(standby_type_).empty())
+				if (!get_all_movetrack(other_chess_type).empty())
 				{
-					add_action(ActionType::STANDBY, standby_type_, Vec2(), Vec2());
+					add_action(ActionType::STANDBY, standby_chess_type_, Vec2(), Vec2());
 				}
 				else
 				{
 					// 山穷水尽
-					add_action(ActionType::GAMEOVER, other_chess_type, Vec2(), Vec2());
+					add_action(ActionType::GAMEOVER, standby_chess_type_, Vec2(), Vec2());
 				}
 			}
 		}

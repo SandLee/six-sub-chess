@@ -12,7 +12,7 @@ using namespace cocos2d;
 
 enum MenuItemType
 {
-	Reset = 1,
+	Restart = 1,
 	GotoMainMenu,
 };
 
@@ -43,7 +43,9 @@ void InitCheckerboard(GameLogic::ChessArray &checkerboard)
 }
 
 GameScene::GameScene()
-	: menu_layer_(nullptr)
+	: player_(nullptr)
+	, banner_(nullptr)
+	, menu_layer_(nullptr)
 	, selected_item_(nullptr)
 {
 
@@ -69,14 +71,10 @@ bool GameScene::init()
         return false;
     }
 
-	// 初始化棋盘
-	GameLogic::ChessArray checkerboard;
-	InitCheckerboard(checkerboard);
-
 	// 创建菜单
 	menu_layer_ = Layer::create();
-	std::array<MenuItemType, 2> tags = { Reset, GotoMainMenu };
-	std::array<const char*, 2> menu_texts = { "reset", "goto_mainmenu" };
+	std::array<MenuItemType, 2> tags = { Restart, GotoMainMenu };
+	std::array<const char*, 2> menu_texts = { "restart", "goto_mainmenu" };
 	float start_x = VisibleRect::rightBottom().x - kMenuItemWidth * 2 - kMenuItemInterval * 2;
 	for (int i = 0; i < 2; ++i)
 	{
@@ -97,14 +95,28 @@ bool GameScene::init()
 		menu_item->addChild(label);
 	}
 
-	// 操作图层
-	logic_.reset(new GameLogic(checkerboard));
-	robot_.reset(new SimpleRobot(GameLogic::ChessPieceType::BLACK, logic_.get()));
-	auto operation_layer = CheckerboardLayer::create();
-	operation_layer->generate_chessboard(GameLogic::ChessPieceType::WHITE, logic_.get());
+	// 玩家操作图层
+	logic_.reset(new GameLogic());
+	robot_.reset(new SimpleRobot(logic_.get()));
+	player_ = CheckerboardLayer::create(logic_.get());
 
-	addChild(operation_layer, 1);
+	addChild(player_, 1);
 	addChild(menu_layer_, 2);
+
+	// 横幅（显示胜负）
+	banner_ = Label::createWithSystemFont("", "", 48);
+	banner_->setColor(Color3B(255, 0, 0));
+	banner_->setAnchorPoint(Vec2(0.5f, 0.5f));
+	banner_->setPosition(VisibleRect::top() - Vec2(0, 150));
+	addChild(banner_);
+	logic_->add_action_update_callback([=]()
+	{
+		GameLogic::Action action = logic_->get_action_from_queue(logic_->get_action_num() - 1);
+		if (action.type == GameLogic::ActionType::GAMEOVER)
+		{
+			banner_->setString(action.chess_type == player_->get_chesspiece_type() ? lang("win") : lang("lost"));
+		}
+	});
 	
 	// 开启触摸
 	auto listener = EventListenerTouchOneByOne::create();
@@ -120,6 +132,25 @@ bool GameScene::init()
     return true;
 }
 
+void GameScene::start_game()
+{
+	banner_->setString("");
+	GameLogic::ChessArray checkerboard;
+	InitCheckerboard(checkerboard);
+
+	if ((rand() % 2) == 0)
+	{
+		robot_->reset(GameLogic::WHITE);
+		player_->reset(GameLogic::BLACK);
+	}
+	else
+	{
+		robot_->reset(GameLogic::BLACK);
+		player_->reset(GameLogic::WHITE);
+	}
+	logic_->start(checkerboard);
+}
+
 void GameScene::update(float delta)
 {
 	if (logic_.get())
@@ -128,9 +159,14 @@ void GameScene::update(float delta)
 	}
 }
 
+void GameScene::onEnterTransitionDidFinish()
+{
+	start_game();
+}
+
 bool GameScene::onTouchBegan(Touch *touch, Event *unused_event)
 {
-	for (int i = Reset; i <= GotoMainMenu; ++i)
+	for (int i = Restart; i <= GotoMainMenu; ++i)
 	{
 		if (menu_layer_->getChildByTag(i)->getBoundingBox().containsPoint(touch->getLocation()))
 		{
@@ -149,7 +185,7 @@ void GameScene::onTouchMoved(Touch *touch, Event *unused_event)
 
 void GameScene::onTouchEnded(Touch *touch, Event *unused_event)
 {
-	for (int i = Reset; i <= GotoMainMenu; ++i)
+	for (int i = Restart; i <= GotoMainMenu; ++i)
 	{
 		if (menu_layer_->getChildByTag(i)->getBoundingBox().containsPoint(touch->getLocation()))
 		{
@@ -157,9 +193,9 @@ void GameScene::onTouchEnded(Touch *touch, Event *unused_event)
 			{
 				switch ((MenuItemType)i)
 				{
-					case Reset:
+					case Restart:
 					{
-					
+						start_game();
 						break;
 					}
 					case GotoMainMenu:

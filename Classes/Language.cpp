@@ -62,7 +62,7 @@ void Language::set_language(LanguageType type)
 	}
 }
 
-const std::string& lang(const std::string &text)
+std::string lang(const std::string &text)
 {
 	auto result = Language::instance()->corresponding_table_.find(text);
 	if (result != Language::instance()->corresponding_table_.end())

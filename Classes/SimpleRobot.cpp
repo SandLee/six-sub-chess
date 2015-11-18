@@ -6,10 +6,10 @@
 #include <algorithm>
 
 
-SimpleRobot::SimpleRobot(GameLogic::ChessPieceType type, GameLogic *logic)
+SimpleRobot::SimpleRobot(GameLogic *logic)
 	: logic_(logic)
-	, chess_type_(type)
 	, action_read_pos_(0)
+	, chess_type_(GameLogic::ChessPieceType::NONE)
 {
 	assert(logic_ != nullptr);
 	logic_->add_action_update_callback(std::bind(&SimpleRobot::update_action, this));
@@ -181,6 +181,13 @@ void SimpleRobot::action_finished()
 {
 	++action_read_pos_;
 	update_action();
+}
+
+// 重置
+void SimpleRobot::reset(GameLogic::ChessPieceType type)
+{
+	chess_type_ = type;
+	action_read_pos_ = 0;
 }
 
 // 获取棋子类型
