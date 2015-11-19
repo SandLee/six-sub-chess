@@ -18,16 +18,10 @@
     <ClCompile Include="..\Classes\AppDelegate.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\VisibleRect.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\Singleton.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="..\Classes\CheckerboardLayer.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\SimpleRobot.cpp">
+    <ClCompile Include="..\Classes\ColorGenerator.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\GameLogic.cpp">
@@ -36,13 +30,19 @@
     <ClCompile Include="..\Classes\GameScene.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\WelcomeScene.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\ColorGenerator.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="..\Classes\Language.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\SimpleRobot.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Singleton.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\VisibleRect.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\WelcomeScene.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -53,16 +53,10 @@
     <ClInclude Include="..\Classes\AppDelegate.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\VisibleRect.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\Singleton.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="..\Classes\CheckerboardLayer.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\SimpleRobot.h">
+    <ClInclude Include="..\Classes\ColorGenerator.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\GameLogic.h">
@@ -71,13 +65,19 @@
     <ClInclude Include="..\Classes\GameScene.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\WelcomeScene.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\ColorGenerator.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="..\Classes\Language.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\SimpleRobot.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Singleton.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\VisibleRect.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\WelcomeScene.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
