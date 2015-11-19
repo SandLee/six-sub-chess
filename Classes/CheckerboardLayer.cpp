@@ -106,6 +106,7 @@ void CheckerboardLayer::reset(GameLogic::ChessPieceType type)
 {
 	assert(logic_ != nullptr);
 	assert(type != GameLogic::ChessPieceType::NONE);
+	action_lock_ = false;
 	action_read_pos_ = 0;
 	operation_lock_ = true;
 	chesspiece_type_ = type;

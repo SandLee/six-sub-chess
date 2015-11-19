@@ -44,6 +44,11 @@ public:
 		Vec2() : x(0), y(0) {}
 		Vec2(int _x, int _y) : x(_x), y(_y) {}
 
+		static Vec2 invalid()
+		{
+			return Vec2(-1, -1);
+		}
+
 		bool operator!= (const Vec2 &that) const
 		{
 			return x != that.x || y != that.y;
