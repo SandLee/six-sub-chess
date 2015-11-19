@@ -134,7 +134,7 @@ void WelcomeScene::onTouchEnded(Touch *touch, Event *unused_event)
 					}
 					case About:
 					{
-						CCLOG("About");
+						Application::getInstance()->openURL("https://github.com/zhangpanyi/six-sub-chess");
 						break;
 					}
 					case QuitGame:
