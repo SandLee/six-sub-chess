@@ -85,7 +85,6 @@ private:
 
 	/**
 	 * 获取棋子精灵
-	 * @param pos 棋盘坐标系位置
 	 */
 	cocos2d::Sprite* get_chesspiece_sprite(const cocos2d::Vec2 &pos);
 
