@@ -41,7 +41,6 @@ private:
 	virtual void onEnterTransitionDidFinish() override;
 
 private:
-	Layer*						menu_layer_;
 	CheckerboardLayer*			player_;
 	cocos2d::Label*				banner_;
 	cocos2d::Node*				selected_item_;

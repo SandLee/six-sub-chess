@@ -45,7 +45,6 @@ void InitCheckerboard(GameLogic::ChessArray &checkerboard)
 GameScene::GameScene()
 	: player_(nullptr)
 	, banner_(nullptr)
-	, menu_layer_(nullptr)
 	, selected_item_(nullptr)
 {
 
@@ -72,7 +71,6 @@ bool GameScene::init()
     }
 
 	// 创建菜单
-	menu_layer_ = Layer::create();
 	std::array<MenuItemType, 2> tags = { Restart, GotoMainMenu };
 	std::array<const char*, 2> menu_texts = { "restart", "mainmenu" };
 	float start_x = VisibleRect::rightBottom().x - kMenuItemWidth * 2 - kMenuItemInterval * 2;
@@ -85,7 +83,7 @@ bool GameScene::init()
 		menu_item->ignoreAnchorPointForPosition(false);
 		menu_item->setPosition(Vec2(start_x + i * kMenuItemWidth + i * kMenuItemInterval, VisibleRect::rightBottom().y + kMenuItemInterval));
 		menu_item->setTag(tags[i]);
-		menu_layer_->addChild(menu_item);
+		addChild(menu_item);
 
 		auto size = menu_item->getContentSize();
 		auto label = Label::createWithSystemFont(lang(menu_texts[i]).c_str(), "", 24);
@@ -99,9 +97,7 @@ bool GameScene::init()
 	logic_.reset(new GameLogic());
 	robot_.reset(new SimpleRobot(logic_.get()));
 	player_ = CheckerboardLayer::create(logic_.get());
-
 	addChild(player_, 1);
-	addChild(menu_layer_, 2);
 
 	// 横幅（显示胜负）
 	banner_ = Label::createWithSystemFont("", "", 48);
@@ -119,13 +115,15 @@ bool GameScene::init()
 	});
 	
 	// 开启触摸
+	auto menu_touch_layer = Layer::create();
+	addChild(menu_touch_layer, 2);
 	auto listener = EventListenerTouchOneByOne::create();
 	listener->setSwallowTouches(true);
 	listener->onTouchBegan = CC_CALLBACK_2(GameScene::onTouchBegan, this);
 	listener->onTouchMoved = CC_CALLBACK_2(GameScene::onTouchMoved, this);
 	listener->onTouchEnded = CC_CALLBACK_2(GameScene::onTouchEnded, this);
 	listener->onTouchCancelled = CC_CALLBACK_2(GameScene::onTouchCancelled, this);
-	getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, menu_layer_);
+	getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, menu_touch_layer);
 	
 	scheduleUpdate();
 
@@ -168,9 +166,9 @@ bool GameScene::onTouchBegan(Touch *touch, Event *unused_event)
 {
 	for (int i = Restart; i <= GotoMainMenu; ++i)
 	{
-		if (menu_layer_->getChildByTag(i)->getBoundingBox().containsPoint(touch->getLocation()))
+		if (getChildByTag(i)->getBoundingBox().containsPoint(touch->getLocation()))
 		{
-			selected_item_ = menu_layer_->getChildByTag(i);
+			selected_item_ = getChildByTag(i);
 			selected_item_->setOpacity(155);
 			return true;
 		}
@@ -187,9 +185,9 @@ void GameScene::onTouchEnded(Touch *touch, Event *unused_event)
 {
 	for (int i = Restart; i <= GotoMainMenu; ++i)
 	{
-		if (menu_layer_->getChildByTag(i)->getBoundingBox().containsPoint(touch->getLocation()))
+		if (getChildByTag(i)->getBoundingBox().containsPoint(touch->getLocation()))
 		{
-			if (menu_layer_->getChildByTag(i) == selected_item_)
+			if (getChildByTag(i) == selected_item_)
 			{
 				switch ((MenuItemType)i)
 				{
