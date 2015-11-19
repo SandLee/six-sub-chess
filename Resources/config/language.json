@@ -5,7 +5,7 @@
         "about": "About",
         "quit_game": "Quit Game",
         "restart": "Restart",
-        "goto_mainmenu": "Goto Main Menu",
+        "mainmenu": "Main Menu",
         "win": "You Win",
         "lost": "You Lose"
     },
@@ -15,7 +15,7 @@
         "about": "关于",
         "quit_game": "退出游戏",
         "restart": "重新开始",
-        "goto_mainmenu": "返回主菜单",
+        "mainmenu": "主菜单",
         "win": "你赢了",
         "lost": "你输了"
     }

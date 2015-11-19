@@ -74,7 +74,7 @@ bool GameScene::init()
 	// 创建菜单
 	menu_layer_ = Layer::create();
 	std::array<MenuItemType, 2> tags = { Restart, GotoMainMenu };
-	std::array<const char*, 2> menu_texts = { "restart", "goto_mainmenu" };
+	std::array<const char*, 2> menu_texts = { "restart", "mainmenu" };
 	float start_x = VisibleRect::rightBottom().x - kMenuItemWidth * 2 - kMenuItemInterval * 2;
 	for (int i = 0; i < 2; ++i)
 	{
