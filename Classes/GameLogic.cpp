@@ -120,7 +120,7 @@ GameLogic::ChessPieceType GameLogic::get_chesspiece_type(const Vec2 &pos) const
 // 是否相邻
 bool GameLogic::is_adjacent(const Vec2 &a, const Vec2 &b) const
 {
-	return is_in_checkerboard(a) && is_in_checkerboard(a) && (abs(b.x - a.x) + abs(b.y - a.y) == 1);
+	return is_in_checkerboard(a) && is_in_checkerboard(a) && (abs(a.x + a.y - b.x - b.y) == 1);
 }
 
 // 移动棋子
