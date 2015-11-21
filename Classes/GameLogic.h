@@ -65,6 +65,9 @@ public:
 		}
 	};
 
+	/**
+	 * 移动轨迹
+	 */
 	struct MoveTrack
 	{
 		GameLogic::Vec2 source;
@@ -123,13 +126,13 @@ public:
 	void add_action_update_callback(std::function<void()> &&callback);
 
 	/**
-	* 获取棋盘数据
-	*/
+	 * 获取棋盘数据
+	 */
 	const ChessArray& get_checkerboard() const;
 
 	/**
-	* 浏览棋盘
-	*/
+	 * 浏览棋盘
+	 */
 	void visit_checkerboard(const std::function<void(const Vec2&, ChessPieceType type)> &callback);
 
 	/**
@@ -209,11 +212,11 @@ private:
 	void add_action(ActionType type, ChessPieceType chess_type, const Vec2 &source, const Vec2 &target);
 
 private:
-	ChessPieceType						standby_chess_type_;
-	std::queue<MoveTrack>				move_queue_;
-	std::vector<Action>					action_queue_;
-	ChessArray							checkerboard_;
-	std::vector<std::function<void()>>	action_callback_list_;
+	ChessPieceType							standby_chess_type_;
+	std::queue<MoveTrack>					move_queue_;
+	std::vector<Action>						action_queue_;
+	ChessArray								checkerboard_;
+	std::vector< std::function<void()> >	action_callback_list_;
 };
 
 #endif
