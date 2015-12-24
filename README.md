@@ -6,3 +6,6 @@ cocos2d-x 3.0(3.7和3.9版本编译通过，目前使用的是3.9)实现的六�
 # 游戏截图
 ![](https://raw.githubusercontent.com/zhangpanyi/six-sub-chess/master/screenshot/1.png)
 ![](https://raw.githubusercontent.com/zhangpanyi/six-sub-chess/master/screenshot/2.png)
+
+# 详细介绍
+[http://igameday.com/game-development/4.html](http://igameday.com/game-development/4.html)
