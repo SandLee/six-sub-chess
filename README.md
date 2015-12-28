@@ -3,9 +3,14 @@ cocos2d-x 3.0(3.7和3.9版本编译通过，目前使用的是3.9)实现的六�
 
 游戏玩法规则非常简单，就是两个吃一个。目前已有机器人陪玩功能，以后可能会加入双人对战(稍微改改即可实现)和局域网联机对战的玩法。
 
+# 运行环境
+Windows
+
+Visual Studio 2015
+
 # 游戏截图
 ![](https://raw.githubusercontent.com/zhangpanyi/six-sub-chess/master/screenshot/1.png)
 ![](https://raw.githubusercontent.com/zhangpanyi/six-sub-chess/master/screenshot/2.png)
 
 # 详细介绍
-[http://igameday.com/game-development/4.html](http://igameday.com/game-development/4.html)
+[http://igameday.com/2015/12/08/4.html](http://igameday.com/2015/12/08/4.html)
