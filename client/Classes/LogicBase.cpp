@@ -35,25 +35,25 @@ void LogicBase::reset()
 }
 
 // 设置棋盘
-void LogicBase::set_checkerboard(const FChessArray &checkerboard)
+void LogicBase::setCheckerboard(const FChessArray &checkerboard)
 {
 	checkerboard_ = checkerboard;
 }
 
 // 添加移动轨迹
-void LogicBase::add_move_track(const FMoveTrack &track)
+void LogicBase::addMovetrack(const FMoveTrack &track)
 {
 	move_queue_.push(track);
 }
 
 // 获取动作数量
-size_t LogicBase::get_action_num() const
+size_t LogicBase::getActionNum() const
 {
 	return action_queue_.size();
 }
 
 // 取出动作信息
-FAction LogicBase::get_action_from_queue(size_t index)
+FAction LogicBase::getActionFromQueue(size_t index)
 {
 	FAction action;
 	action.type = FActionType::NONE;
@@ -66,7 +66,7 @@ FAction LogicBase::get_action_from_queue(size_t index)
 }
 
 // 添加动作更新通知
-void LogicBase::add_action_update_callback(const std::function<void()> &callback)
+void LogicBase::addActionUpdateCallback(const std::function<void()> &callback)
 {
 	assert(callback != nullptr);
 	if (callback != nullptr)
@@ -76,13 +76,13 @@ void LogicBase::add_action_update_callback(const std::function<void()> &callback
 }
 
 // 获取棋盘数据
-const FChessArray& LogicBase::get_checkerboard() const
+const FChessArray& LogicBase::getCheckerboard() const
 {
 	return checkerboard_;
 }
 
 // 浏览棋盘
-void LogicBase::visit_checkerboard(const std::function<void(const FVec2&, FChessPieceType type)> &callback)
+void LogicBase::visitCheckerboard(const std::function<void(const FVec2&, FChessPieceType type)> &callback)
 {
 	if (callback != nullptr)
 	{
@@ -96,7 +96,7 @@ void LogicBase::visit_checkerboard(const std::function<void(const FVec2&, FChess
 }
 
 // 添加动作
-void LogicBase::add_action(FActionType type, FChessPieceType chess_type, const FVec2 &source, const FVec2 &target)
+void LogicBase::addAction(FActionType type, FChessPieceType chess_type, const FVec2 &source, const FVec2 &target)
 {
 	FAction action;
 	action.type = type;
@@ -111,37 +111,37 @@ void LogicBase::add_action(FActionType type, FChessPieceType chess_type, const F
 }
 
 // 是否在棋盘
-bool LogicBase::is_in_checkerboard(const FVec2 &pos) const
+bool LogicBase::isInCheckerboard(const FVec2 &pos) const
 {
 	return pos.x >= 0 && pos.y >= 0 && pos.x < kCheckerboardColNum && pos.y < kCheckerboardRowNum;
 }
 
 // 棋子是否有效
-bool LogicBase::is_valid_chesspiece(const FVec2 &pos) const
+bool LogicBase::isValidChesspiece(const FVec2 &pos) const
 {
-	return is_in_checkerboard(pos) && checkerboard_[pos.y  * kCheckerboardRowNum + pos.x] != FChessPieceType::NONE;
+	return isInCheckerboard(pos) && checkerboard_[pos.y  * kCheckerboardRowNum + pos.x] != FChessPieceType::NONE;
 }
 
 // 获取棋子类型
-FChessPieceType LogicBase::get_chesspiece_type(const FVec2 &pos) const
+FChessPieceType LogicBase::getChesspieceType(const FVec2 &pos) const
 {
-	return is_valid_chesspiece(pos) ? checkerboard_[pos.y  * kCheckerboardRowNum + pos.x] : FChessPieceType::NONE;
+	return isValidChesspiece(pos) ? checkerboard_[pos.y  * kCheckerboardRowNum + pos.x] : FChessPieceType::NONE;
 }
 
 // 获取待机棋子类型
-FChessPieceType LogicBase::get_standby_chesspiece_type() const
+FChessPieceType LogicBase::getStandbyChesspieceType() const
 {
 	return standby_chess_type_;
 }
 
 // 是否相邻
-bool LogicBase::is_adjacent(const FVec2 &a, const FVec2 &b) const
+bool LogicBase::isAdjacent(const FVec2 &a, const FVec2 &b) const
 {
-	return is_in_checkerboard(a) && is_in_checkerboard(a) && (std::abs(a.x + a.y - b.x - b.y) == 1);
+	return isInCheckerboard(a) && isInCheckerboard(a) && (std::abs(a.x + a.y - b.x - b.y) == 1);
 }
 
 // 获取所有可行的移动路径
-std::vector<FMoveTrack> LogicBase::get_all_movetrack(FChessPieceType type) const
+std::vector<FMoveTrack> LogicBase::getAllMovetrack(FChessPieceType type) const
 {
 	size_t idx = 0;
 	std::vector<FMoveTrack> track_array;
@@ -156,12 +156,12 @@ std::vector<FMoveTrack> LogicBase::get_all_movetrack(FChessPieceType type) const
 			{
 				FVec2 v1(col + i, row);
 				FVec2 v2(col, row + i);
-				if (is_in_checkerboard(v1) && !is_valid_chesspiece(v1))
+				if (isInCheckerboard(v1) && !isValidChesspiece(v1))
 				{
 					FMoveTrack track = { FVec2(col, row), v1 };
 					track_array.push_back(track);
 				}
-				if (is_in_checkerboard(v2) && !is_valid_chesspiece(v2))
+				if (isInCheckerboard(v2) && !isValidChesspiece(v2))
 				{
 					FMoveTrack track = { FVec2(col, row), v2 };
 					track_array.push_back(track);
@@ -181,21 +181,21 @@ void LogicBase::update(float dt)
 		const FVec2 &source = move_queue_.front().source;
 		const FVec2 &target = move_queue_.front().target;
 
-		if (source != target && is_valid_chesspiece(source) && !is_valid_chesspiece(target)
-			&& is_adjacent(source, target) && checkerboard_[target.y  * kCheckerboardRowNum + target.x] != standby_chess_type_)
+		if (source != target && isValidChesspiece(source) && !isValidChesspiece(target)
+			&& isAdjacent(source, target) && checkerboard_[target.y  * kCheckerboardRowNum + target.x] != standby_chess_type_)
 		{
 			// 交换数据
 			std::swap(checkerboard_[source.y  * kCheckerboardRowNum + source.x], checkerboard_[target.y  * kCheckerboardRowNum + target.x]);
 
 			// 新增动作
-			add_action(FActionType::MOVED, checkerboard_[target.y  * kCheckerboardRowNum + target.x], source, target);
+			addAction(FActionType::MOVED, checkerboard_[target.y  * kCheckerboardRowNum + target.x], source, target);
 
 			// 检测杀棋
 			std::set<FVec2> killed_set = helper::CheckKillChesspiece(checkerboard_, target);
 			for (auto &pos : killed_set)
 			{
 				checkerboard_[pos.y  * kCheckerboardRowNum + pos.x] = FChessPieceType::NONE;
-				add_action(FActionType::KILLED, FChessPieceType::NONE, target, pos);
+				addAction(FActionType::KILLED, FChessPieceType::NONE, target, pos);
 			}
 
 			// 是否无棋可用
@@ -213,26 +213,26 @@ void LogicBase::update(float dt)
 			// 游戏是否结束
 			if (count <= 1)
 			{
-				add_action(FActionType::GAMEOVER, standby_chess_type_, FVec2::invalid(), FVec2::invalid());
+				addAction(FActionType::GAMEOVER, standby_chess_type_, FVec2::invalid(), FVec2::invalid());
 			}
 			else
 			{
 				// 玩家待机	
-				if (!get_all_movetrack(other_chess_type).empty())
+				if (!getAllMovetrack(other_chess_type).empty())
 				{
-					add_action(FActionType::STANDBY, standby_chess_type_, FVec2::invalid(), FVec2::invalid());
+					addAction(FActionType::STANDBY, standby_chess_type_, FVec2::invalid(), FVec2::invalid());
 				}
 				else
 				{
 					// 山穷水尽
-					add_action(FActionType::GAMEOVER, standby_chess_type_, FVec2::invalid(), FVec2::invalid());
+					addAction(FActionType::GAMEOVER, standby_chess_type_, FVec2::invalid(), FVec2::invalid());
 					for (size_t i = 0; i < checkerboard_.size(); ++i)
 					{
 						if (checkerboard_[i] == other_chess_type)
 						{
 							int row = i / kCheckerboardColNum;
 							int col = i % kCheckerboardColNum;
-							add_action(FActionType::KILLED, FChessPieceType::NONE, FVec2::invalid(), FVec2(col, row));
+							addAction(FActionType::KILLED, FChessPieceType::NONE, FVec2::invalid(), FVec2(col, row));
 						}
 					}
 				}

@@ -108,68 +108,68 @@ public:
 	/**
 	 * 获取上方玩家棋子类型
 	 */
-	virtual FChessPieceType get_upperplayer_chesspiece_type() const = 0;
+	virtual FChessPieceType getUpperplayerChesspieceType() const = 0;
 
 	/**
 	* 获取下方玩家棋子类型
 	*/
-	virtual FChessPieceType get_belowplayer_chesspiece_type() const = 0;
+	virtual FChessPieceType getBelowplayerChesspieceType() const = 0;
 
 	/**
 	 * 移动棋子
 	 */
-	virtual void move_chesspiece(const FVec2 &source, const FVec2 &target) = 0;
+	virtual void moveChesspiece(const FVec2 &source, const FVec2 &target) = 0;
 
 public:
 	/**
 	 * 获取动作数量
 	 */
-	size_t get_action_num() const;
+	size_t getActionNum() const;
 
 	/**
 	 * 获取动作信息
 	 */
-	FAction get_action_from_queue(size_t index);
+	FAction getActionFromQueue(size_t index);
 
 	/**
 	 * 添加动作更新回调
 	 */
-	void add_action_update_callback(const std::function<void()> &callback);
+	void addActionUpdateCallback(const std::function<void()> &callback);
 
 	/**
 	 * 获取棋盘数据
 	 */
-	const FChessArray& get_checkerboard() const;
+	const FChessArray& getCheckerboard() const;
 
 	/**
 	 * 浏览棋盘
 	 */
-	void visit_checkerboard(const std::function<void(const FVec2&, FChessPieceType type)> &callback);
+	void visitCheckerboard(const std::function<void(const FVec2&, FChessPieceType type)> &callback);
 
 	/**
 	 * 是否在棋盘
 	 */
-	bool is_in_checkerboard(const FVec2 &pos) const;
+	bool isInCheckerboard(const FVec2 &pos) const;
 
 	/**
 	 * 棋子是否有效
 	 */
-	bool is_valid_chesspiece(const FVec2 &pos) const;
+	bool isValidChesspiece(const FVec2 &pos) const;
 
 	/**
 	 * 获取棋子类型
 	 */
-	FChessPieceType get_chesspiece_type(const FVec2 &pos) const;
+	FChessPieceType getChesspieceType(const FVec2 &pos) const;
 
 	/**
 	 * 获取待机棋子类型
 	 */
-	FChessPieceType get_standby_chesspiece_type() const;
+	FChessPieceType getStandbyChesspieceType() const;
 
 	/**
 	 * 是否相邻
 	 */
-	bool is_adjacent(const FVec2 &a, const FVec2 &b) const;
+	bool isAdjacent(const FVec2 &a, const FVec2 &b) const;
 
 	/**
 	 * 更新
@@ -189,23 +189,23 @@ protected:
 	/**
 	 * 设置棋盘
 	 */
-	void set_checkerboard(const FChessArray &checkerboard);
+	void setCheckerboard(const FChessArray &checkerboard);
 
 	/**
 	 * 添加移动轨迹
 	 */
-	void add_move_track(const FMoveTrack &track);
+	void addMovetrack(const FMoveTrack &track);
 
 	/**
 	 * 添加动作
 	 */
-	void add_action(FActionType type, FChessPieceType chess_type, const FVec2 &source, const FVec2 &target);
+	void addAction(FActionType type, FChessPieceType chess_type, const FVec2 &source, const FVec2 &target);
 
 private:
 	/**
 	 * 获取所有可行的移动路径
 	 */
-	std::vector<FMoveTrack> get_all_movetrack(FChessPieceType type) const;
+	std::vector<FMoveTrack> getAllMovetrack(FChessPieceType type) const;
 
 private:
 	FChessPieceType							standby_chess_type_;

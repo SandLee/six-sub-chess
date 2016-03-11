@@ -31,37 +31,37 @@ public:
 	/**
 	 * 获取棋子开始位置
 	 */
-	cocos2d::Vec2 get_chesspiece_start_pos() const;
+	cocos2d::Vec2 getChesspieceStartPos() const;
 
 	/**
 	 * 获取棋子类型
 	 */
-	FChessPieceType get_chesspiece_type() const;
+	FChessPieceType getChesspieceType() const;
 
 	/**
 	 * 棋盘坐标转换到世界坐标
 	 */
-	cocos2d::Vec2 convert_to_world_space(const cocos2d::Vec2 &pos) const;
+	cocos2d::Vec2 convertToWorldSpace(const cocos2d::Vec2 &pos) const;
 
 	/**
 	 * 世界坐标转换棋盘坐标
 	 */
-	cocos2d::Vec2 convert_to_checkerboard_space(const cocos2d::Vec2 &pos) const;
+	cocos2d::Vec2 convertToCheckerboardSpace(const cocos2d::Vec2 &pos) const;
 
 	/**
 	 * 更新动作
 	 */
-	void update_action();
+	void updateAction();
 
 	/**
 	 * 执行动作
 	 */
-	void run_action();
+	void runPlayerAction();
 
 	/**
 	 * 完成动作
 	 */
-	void action_finished();
+	void actionFinished();
 
 public:
 	virtual bool onTouchBegan(cocos2d::Touch *touch, cocos2d::Event *unused_event) override;
@@ -76,34 +76,34 @@ private:
 	/**
 	 * 刷新棋盘
 	 */
-	void refresh_checkerboard();
+	void refreshCheckerboard();
 
 	/**
 	 * 棋盘坐标转视图坐标
 	 */
-	cocos2d::Vec2 convert_to_view_space(const cocos2d::Vec2 &pos) const;
+	cocos2d::Vec2 convertToViewSpace(const cocos2d::Vec2 &pos) const;
 
 	/**
 	 * 获取棋子精灵
 	 */
-	cocos2d::Sprite* get_chesspiece_sprite(const cocos2d::Vec2 &pos);
+	cocos2d::Sprite* getChesspieceSprite(const cocos2d::Vec2 &pos);
 
 	/**
 	 * 移动棋子
 	 */
-	void on_move_chesspiece(const cocos2d::Vec2 &source, const cocos2d::Vec2 &target);
+	void onMoveChesspiece(const cocos2d::Vec2 &source, const cocos2d::Vec2 &target);
 
 	/**
 	 * 吃掉棋子
 	 */
-	void on_kill_chesspiece(const cocos2d::Vec2 &source, const cocos2d::Vec2 &target);
+	void onKillChesspiece(const cocos2d::Vec2 &source, const cocos2d::Vec2 &target);
 
 private:
-	SingleLogic*											logic_;
+	SingleLogic*										logic_;
 	bool												action_lock_;
 	bool												operation_lock_;
 	int													action_read_pos_;
-	FChessPieceType							chesspiece_type_;
+	FChessPieceType										chesspiece_type_;
 	cocos2d::Sprite*									selected_chesspiece_;
 	cocos2d::Vec2										touch_begin_pos_;
 	std::vector<cocos2d::Sprite *>						free_sprite_;

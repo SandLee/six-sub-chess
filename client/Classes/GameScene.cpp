@@ -91,7 +91,7 @@ bool GameScene::init()
 	getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, menu_touch_layer);
 
 	// 监听游戏逻辑
-	logic_->add_action_update_callback(std::bind(&GameScene::onBeReady, this));
+	logic_->addActionUpdateCallback(std::bind(&GameScene::onBeReady, this));
 	
 	scheduleUpdate();
 
@@ -112,11 +112,11 @@ void GameScene::startGame()
 // 准备完毕
 void GameScene::onBeReady()
 {
-	FAction action = logic_->get_action_from_queue(logic_->get_action_num() - 1);
+	FAction action = logic_->getActionFromQueue(logic_->getActionNum() - 1);
 	if (action.type == FActionType::BEREADY)
 	{
-		robot_->reset(logic_->get_upperplayer_chesspiece_type());
-		checkerboard_->reset(logic_->get_belowplayer_chesspiece_type());
+		robot_->reset(logic_->getUpperplayerChesspieceType());
+		checkerboard_->reset(logic_->getBelowplayerChesspieceType());
 	}	
 }
 

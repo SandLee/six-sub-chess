@@ -36,7 +36,7 @@ Language::~Language()
 
 }
 
-void Language::set_language(LanguageType type)
+void Language::setLanguage(LanguageType type)
 {
 	if (type != LanguageType::CHINESE)
 	{

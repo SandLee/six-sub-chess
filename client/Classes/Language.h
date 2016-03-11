@@ -12,7 +12,7 @@ class Language : public Singleton < Language >
 	friend std::string lang(const std::string &text);
 
 public:
-	void set_language(cocos2d::LanguageType type);
+	void setLanguage(cocos2d::LanguageType type);
 
 private:
 	std::unordered_map<std::string, std::string> corresponding_table_;

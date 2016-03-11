@@ -43,7 +43,7 @@ bool WelcomeScene::init()
 	}
 
 	// 设置语言
-	Language::instance()->set_language(LanguageType::CHINESE);
+	Language::instance()->setLanguage(LanguageType::CHINESE);
 
 	// 创建菜单
 	Vec2 start_pos;
@@ -52,7 +52,7 @@ bool WelcomeScene::init()
 	auto yyy = VisibleRect::center().y;
 	start_pos.x = VisibleRect::center().x - (kMenuItemWidth * kMenuColNum + kMenuItemInterval * (kMenuColNum - 1)) / 2 + kMenuItemWidth / 2;
 	start_pos.y = VisibleRect::center().y + (kMenuItemHeight * kMenuRowNum + kMenuItemInterval * (kMenuRowNum - 1)) / 2 - kMenuItemHeight / 2;
-	std::vector<cocos2d::Color3B> colors = ColorGenerator::instance()->rand_not_repeat(5);
+	std::vector<cocos2d::Color3B> colors = ColorGenerator::instance()->randNotRepeat(5);
 	for (size_t i = 0; i < 4; ++i)
 	{
 		int row = i / kMenuColNum;

@@ -18,12 +18,12 @@ public:
 	/**
 	 * 最多随机生成不重复颜色的数量
 	 */
-	unsigned int max_rand_not_repeat_num() const;
+	unsigned int maxRandNotRepeatNum() const;
 
 	/**
 	 * 随机生成几种不重复的颜色（最多支持七种）
 	 */
-	std::vector<cocos2d::Color3B> rand_not_repeat(unsigned int num) const;
+	std::vector<cocos2d::Color3B> randNotRepeat(unsigned int num) const;
 
 private:
 	mutable std::default_random_engine generator_;

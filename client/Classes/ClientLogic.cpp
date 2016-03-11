@@ -43,19 +43,19 @@ void ClientLogic::ready()
 }
 
 // 获取上方玩家棋子类型
-FChessPieceType ClientLogic::get_upperplayer_chesspiece_type() const
+FChessPieceType ClientLogic::getUpperplayerChesspieceType() const
 {
 	return FChessPieceType();
 }
 
 // 获取下方玩家棋子类型
-FChessPieceType ClientLogic::get_belowplayer_chesspiece_type() const
+FChessPieceType ClientLogic::getBelowplayerChesspieceType() const
 {
 	return FChessPieceType();
 }
 
 // 移动棋子
-void ClientLogic::move_chesspiece(const FVec2 &source, const FVec2 &target)
+void ClientLogic::moveChesspiece(const FVec2 &source, const FVec2 &target)
 {
 	// 移动棋子
 }

@@ -12,7 +12,7 @@ SimpleRobot::SimpleRobot(SingleLogic *logic)
 	, chess_type_(FChessPieceType::NONE)
 {
 	assert(logic_ != nullptr);
-	logic_->add_action_update_callback(std::bind(&SimpleRobot::update_action, this));
+	logic_->addActionUpdateCallback(std::bind(&SimpleRobot::updateAction, this));
 }
 
 SimpleRobot::~SimpleRobot()
@@ -21,13 +21,13 @@ SimpleRobot::~SimpleRobot()
 }
 
 // 更新动作
-void SimpleRobot::update_action()
+void SimpleRobot::updateAction()
 {
-	run_action();
+	runAction();
 }
 
 // 获取所有可行的移动路径
-std::vector<FMoveTrack> SimpleRobot::get_all_movetrack(const FChessArray &checkerboard, FChessPieceType type) const
+std::vector<FMoveTrack> SimpleRobot::getAllMovetrack(const FChessArray &checkerboard, FChessPieceType type) const
 {
 	size_t idx = 0;
 	std::vector<FMoveTrack> track_array;
@@ -42,12 +42,12 @@ std::vector<FMoveTrack> SimpleRobot::get_all_movetrack(const FChessArray &checke
 			{
 				FVec2 v1(col + i, row);
 				FVec2 v2(col, row + i);
-				if (is_in_checkerboard(v1) && !is_valid_chesspiece(checkerboard, v1))
+				if (isInCheckerboard(v1) && !isValidChesspiece(checkerboard, v1))
 				{
 					FMoveTrack track = { FVec2(col, row), v1 };
 					track_array.push_back(track);
 				}
-				if (is_in_checkerboard(v2) && !is_valid_chesspiece(checkerboard, v2))
+				if (isInCheckerboard(v2) && !isValidChesspiece(checkerboard, v2))
 				{
 					FMoveTrack track = { FVec2(col, row), v2 };
 					track_array.push_back(track);
@@ -60,10 +60,10 @@ std::vector<FMoveTrack> SimpleRobot::get_all_movetrack(const FChessArray &checke
 }
 
 // 获取可杀死敌方棋子的移动路径
-std::vector<FMoveTrack> SimpleRobot::get_can_kill_chess_movetrack(std::vector<FMoveTrack> &track_array) const
+std::vector<FMoveTrack> SimpleRobot::getCanKillChessMovetrack(std::vector<FMoveTrack> &track_array) const
 {
 	std::vector<FMoveTrack> kill_chess_array;
-	FChessArray checkerboard = logic_->get_checkerboard();
+	FChessArray checkerboard = logic_->getCheckerboard();
 	for (size_t i = 0; i < track_array.size(); ++i)
 	{
 		// 模拟出棋
@@ -85,11 +85,11 @@ std::vector<FMoveTrack> SimpleRobot::get_can_kill_chess_movetrack(std::vector<FM
 }
 
 // 获取可躲避被杀棋的移动路径
-std::vector<FMoveTrack> SimpleRobot::get_can_avoid_chess_movetrack(std::vector<FMoveTrack> &track_array) const
+std::vector<FMoveTrack> SimpleRobot::getCanAvoidChessMovetrack(std::vector<FMoveTrack> &track_array) const
 {
 	std::vector<FMoveTrack> avoid_chess_array = track_array;
-	FChessArray checkerboard = logic_->get_checkerboard();
-	auto other_chesspiece_type = get_chesspiece_type() == FChessPieceType::WHITE ? FChessPieceType::BLACK : FChessPieceType::WHITE;
+	FChessArray checkerboard = logic_->getCheckerboard();
+	auto other_chesspiece_type = getChesspieceType() == FChessPieceType::WHITE ? FChessPieceType::BLACK : FChessPieceType::WHITE;
 	for (size_t i = 0; i < track_array.size(); ++i)
 	{
 		// 模拟出棋
@@ -99,7 +99,7 @@ std::vector<FMoveTrack> SimpleRobot::get_can_avoid_chess_movetrack(std::vector<F
 
 		// 模拟对方出棋
 		{
-			std::vector<FMoveTrack> other_track_array = get_all_movetrack(checkerboard, other_chesspiece_type);
+			std::vector<FMoveTrack> other_track_array = getAllMovetrack(checkerboard, other_chesspiece_type);
 			for (size_t j = 0; j < other_track_array.size(); ++j)
 			{
 				// 模拟出棋
@@ -129,58 +129,58 @@ std::vector<FMoveTrack> SimpleRobot::get_can_avoid_chess_movetrack(std::vector<F
 }
 
 // 执行动作
-void SimpleRobot::run_action()
+void SimpleRobot::runAction()
 {
-	FAction action = logic_->get_action_from_queue(action_read_pos_);
+	FAction action = logic_->getActionFromQueue(action_read_pos_);
 	if (action.type != FActionType::NONE)
 	{
 		if (action.type == FActionType::STANDBY &&
-			action.chess_type != get_chesspiece_type())
+			action.chess_type != getChesspieceType())
 		{
 			// 获取所有可行的移动轨迹
-			const FChessArray &checkerboard = logic_->get_checkerboard();
-			std::vector<FMoveTrack> track_array = get_all_movetrack(checkerboard, get_chesspiece_type());
+			const FChessArray &checkerboard = logic_->getCheckerboard();
+			std::vector<FMoveTrack> track_array = getAllMovetrack(checkerboard, getChesspieceType());
 
 			if (!track_array.empty())
 			{
 				// 获取可杀死敌方棋子的移动轨迹
-				std::vector<FMoveTrack> kill_chess_array = get_can_kill_chess_movetrack(track_array);
+				std::vector<FMoveTrack> kill_chess_array = getCanKillChessMovetrack(track_array);
 
 				// 优先杀死对方棋子，其次躲避对方
 				if (!kill_chess_array.empty())
 				{
-					logic_->move_chesspiece(kill_chess_array.front().source, kill_chess_array.front().target);
+					logic_->moveChesspiece(kill_chess_array.front().source, kill_chess_array.front().target);
 				}
 				else
 				{
-					std::vector<FMoveTrack> avoid_chess_array = get_can_avoid_chess_movetrack(track_array);
+					std::vector<FMoveTrack> avoid_chess_array = getCanAvoidChessMovetrack(track_array);
 					if (avoid_chess_array.empty())
 					{
 						std::default_random_engine generator(time(nullptr));
 						std::uniform_int_distribution<int> dis(0, track_array.size() - 1);
 						const FMoveTrack &track = track_array[dis(generator)];
-						logic_->move_chesspiece(track.source, track.target);
+						logic_->moveChesspiece(track.source, track.target);
 					}
 					else
 					{
 						std::default_random_engine generator(time(nullptr));
 						std::uniform_int_distribution<int> dis(0, avoid_chess_array.size() - 1);
 						const FMoveTrack &track = avoid_chess_array[dis(generator)];
-						logic_->move_chesspiece(track.source, track.target);
+						logic_->moveChesspiece(track.source, track.target);
 					}
 				}
 			}
 		}
 
-		action_finished();
+		actionFinished();
 	}
 }
 
 // 完成动作
-void SimpleRobot::action_finished()
+void SimpleRobot::actionFinished()
 {
 	++action_read_pos_;
-	update_action();
+	updateAction();
 }
 
 // 重置
@@ -191,7 +191,7 @@ void SimpleRobot::reset(FChessPieceType type)
 }
 
 // 获取棋子类型
-FChessPieceType SimpleRobot::get_chesspiece_type() const
+FChessPieceType SimpleRobot::getChesspieceType() const
 {
 	return chess_type_;
 }

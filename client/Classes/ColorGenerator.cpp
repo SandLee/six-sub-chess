@@ -36,18 +36,18 @@ Color3B ColorGenerator::rand() const
 }
 
 // 最多随机生成不重复颜色的数量
-unsigned int ColorGenerator::max_rand_not_repeat_num() const
+unsigned int ColorGenerator::maxRandNotRepeatNum() const
 {
 	return g_seven_colors.size();
 }
 
 // 随机生成几种不重复的颜色（最多支持七种）
-std::vector<cocos2d::Color3B> ColorGenerator::rand_not_repeat(unsigned int num) const
+std::vector<cocos2d::Color3B> ColorGenerator::randNotRepeat(unsigned int num) const
 {
-	assert(num <= max_rand_not_repeat_num());
-	if (num > max_rand_not_repeat_num())
+	assert(num <= maxRandNotRepeatNum());
+	if (num > maxRandNotRepeatNum())
 	{
-		num = max_rand_not_repeat_num();
+		num = maxRandNotRepeatNum();
 	}
 	std::vector<cocos2d::Color3B> color_array;
 	std::vector<Color3B> seven_colors = g_seven_colors;
