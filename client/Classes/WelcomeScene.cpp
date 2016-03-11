@@ -117,6 +117,7 @@ void WelcomeScene::onTouchEnded(Touch *touch, Event *unused_event)
 				switch ((MenuItemType)i)
 				{
 					case SingleGame:
+					case OnlineGame:
 					{
 						runAction(Sequence::create(
 							DelayTime::create(0.2f),
@@ -125,11 +126,6 @@ void WelcomeScene::onTouchEnded(Touch *touch, Event *unused_event)
 							Director::getInstance()->replaceScene(TransitionFade::create(0.5f, GameScene::createScene()));
 						}),
 							nullptr));
-						break;
-					}
-					case OnlineGame:
-					{
-						CCLOG("OnlineGame");
 						break;
 					}
 					case About:

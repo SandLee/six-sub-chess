@@ -2,7 +2,7 @@
 #define __GAMESCENE_H__
 
 #include "cocos2d.h"
-#include "GameLogic.h"
+#include "SingleLogic.h"
 #include "SimpleRobot.h"
 
 class CheckerboardLayer;
@@ -37,7 +37,9 @@ public:
 	virtual void onTouchCancelled(cocos2d::Touch *touch, cocos2d::Event *unused_event) override;
 
 private:
-	void start_game();
+	void startGame();
+
+	void onBeReady();
 
 	virtual void update(float delta) override;
 
@@ -47,7 +49,7 @@ private:
 	CheckerboardLayer*			checkerboard_;
 	cocos2d::Label*				game_tips_;
 	cocos2d::Node*				selected_item_;
-	std::auto_ptr<GameLogic>	logic_;
+	std::auto_ptr<SingleLogic>	logic_;
 	std::auto_ptr<SimpleRobot>	robot_;
 };
 

@@ -4,7 +4,6 @@
 #include "Language.h"
 #include "VisibleRect.h"
 #include "WelcomeScene.h"
-#include "json/document.h"
 #include "ColorGenerator.h"
 #include "CheckerboardLayer.h"
 using namespace cocos2d;
@@ -15,32 +14,6 @@ enum MenuItemType
 	Restart = 1,
 	GotoMainMenu,
 };
-
-// 初始化棋盘
-void InitCheckerboard(GameLogic::ChessArray &checkerboard)
-{
-	Data data = FileUtils::getInstance()->getDataFromFile("config/init.json");
-
-	// 解析json
-	rapidjson::Document doc;
-	doc.Parse<0>(std::string((const char *)data.getBytes(), data.getSize()).c_str());
-	if (doc.HasParseError() || !doc.IsArray())
-	{
-		CCAssert(false, "Json parse error!");
-	}
-
-	if (doc.Size() != GameLogic::kCheckerboardRowNum * GameLogic::kCheckerboardColNum)
-	{
-		CCAssert(false, "Array size error!");
-	}
-
-	for (size_t i = 0; i < doc.Size(); ++i)
-	{
-		int row = i / GameLogic::kCheckerboardColNum;
-		int col = i % GameLogic::kCheckerboardColNum;
-		checkerboard[row * GameLogic::kCheckerboardRowNum + col] = static_cast<GameLogic::ChessPieceType>(doc[doc.Size() - i - 1].GetInt());
-	}
-}
 
 GameScene::GameScene()
 	: checkerboard_(nullptr)
@@ -94,7 +67,7 @@ bool GameScene::init()
 	}
 
 	// 玩家操作图层
-	logic_.reset(new GameLogic());
+	logic_.reset(new SingleLogic());
 	robot_.reset(new SimpleRobot(logic_.get()));
 	checkerboard_ = CheckerboardLayer::create(logic_.get());
 	addChild(checkerboard_, 1);
@@ -116,6 +89,9 @@ bool GameScene::init()
 	listener->onTouchEnded = CC_CALLBACK_2(GameScene::onTouchEnded, this);
 	listener->onTouchCancelled = CC_CALLBACK_2(GameScene::onTouchCancelled, this);
 	getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, menu_touch_layer);
+
+	// 监听游戏逻辑
+	logic_->add_action_update_callback(std::bind(&GameScene::onBeReady, this));
 	
 	scheduleUpdate();
 
@@ -127,23 +103,29 @@ void GameScene::setGameTips(const std::string &str)
 	game_tips_->setString(str);
 }
 
-void GameScene::start_game()
+// 开始游戏
+void GameScene::startGame()
 {
-	setGameTips("");
-	GameLogic::ChessArray checkerboard;
-	InitCheckerboard(checkerboard);
+	logic_->ready();
+}
 
-	if ((rand() % 2) == 0)
+// 准备完毕
+void GameScene::onBeReady()
+{
+	FAction action = logic_->get_action_from_queue(logic_->get_action_num() - 1);
+	if (action.type == FActionType::BEREADY)
 	{
-		robot_->reset(GameLogic::WHITE);
-		checkerboard_->reset(GameLogic::BLACK);
-	}
-	else
-	{
-		robot_->reset(GameLogic::BLACK);
-		checkerboard_->reset(GameLogic::WHITE);
-	}
-	logic_->start(checkerboard);
+		if ((rand() % 2) == 0)
+		{
+			robot_->reset(FChessPieceType::WHITE);
+			checkerboard_->reset(FChessPieceType::BLACK);
+		}
+		else
+		{
+			robot_->reset(FChessPieceType::BLACK);
+			checkerboard_->reset(FChessPieceType::WHITE);
+		}
+	}	
 }
 
 void GameScene::update(float delta)
@@ -156,7 +138,7 @@ void GameScene::update(float delta)
 
 void GameScene::onEnterTransitionDidFinish()
 {
-	start_game();
+	startGame();
 }
 
 bool GameScene::onTouchBegan(Touch *touch, Event *unused_event)
@@ -190,7 +172,7 @@ void GameScene::onTouchEnded(Touch *touch, Event *unused_event)
 				{
 					case Restart:
 					{
-						start_game();
+						startGame();
 						break;
 					}
 					case GotoMainMenu:

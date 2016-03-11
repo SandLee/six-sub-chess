@@ -2,12 +2,12 @@
 #define __SIMPLEROBOT_H__
 
 #include <memory>
-#include "GameLogic.h"
+#include "SingleLogic.h"
 
 class SimpleRobot
 {
 public:
-	SimpleRobot(GameLogic *logic);
+	SimpleRobot(SingleLogic *logic);
 	~SimpleRobot();
 
 public:
@@ -29,28 +29,28 @@ public:
 	/**
 	 * 重置
 	 */
-	void reset(GameLogic::ChessPieceType type);
+	void reset(FChessPieceType type);
 
 	/**
 	 * 获取棋子类型
 	 */
-	GameLogic::ChessPieceType get_chesspiece_type() const;
+	FChessPieceType get_chesspiece_type() const;
 
 public:
 	/**
 	 * 获取可杀死敌方棋子的移动路径
 	 */
-	std::vector<GameLogic::MoveTrack> get_can_kill_chess_movetrack(std::vector<GameLogic::MoveTrack> &track_array) const;
+	std::vector<FMoveTrack> get_can_kill_chess_movetrack(std::vector<FMoveTrack> &track_array) const;
 
 	/**
 	 * 获取可躲避被杀棋的移动路径
 	 */
-	std::vector<GameLogic::MoveTrack> get_can_avoid_chess_movetrack(std::vector<GameLogic::MoveTrack> &track_array) const;
+	std::vector<FMoveTrack> get_can_avoid_chess_movetrack(std::vector<FMoveTrack> &track_array) const;
 
 	/**
 	 * 获取所有可行的移动路径
 	 */
-	std::vector<GameLogic::MoveTrack> get_all_movetrack(const GameLogic::ChessArray &checkerboard, GameLogic::ChessPieceType type) const;
+	std::vector<FMoveTrack> get_all_movetrack(const FChessArray &checkerboard, FChessPieceType type) const;
 
 protected:
 	SimpleRobot(const SimpleRobot &) = delete;
@@ -58,21 +58,21 @@ protected:
 
 private:
 	// 是否在棋盘
-	bool is_in_checkerboard(const GameLogic::Vec2 &pos) const
+	bool is_in_checkerboard(const FVec2 &pos) const
 	{
-		return pos.x >= 0 && pos.y >= 0 && pos.x < GameLogic::kCheckerboardColNum && pos.y < GameLogic::kCheckerboardRowNum;
+		return pos.x >= 0 && pos.y >= 0 && pos.x < kCheckerboardColNum && pos.y < kCheckerboardRowNum;
 	}
 
 	// 棋子是否有效
-	bool is_valid_chess_piece(const GameLogic::ChessArray &checkerboard, const GameLogic::Vec2 &pos) const
+	bool is_valid_chess_piece(const FChessArray &checkerboard, const FVec2 &pos) const
 	{
-		return is_in_checkerboard(pos) && checkerboard[pos.y  * GameLogic::kCheckerboardRowNum + pos.x] != GameLogic::ChessPieceType::NONE;
+		return is_in_checkerboard(pos) && checkerboard[pos.y  * kCheckerboardRowNum + pos.x] != FChessPieceType::NONE;
 	}
 
 private:
-	GameLogic*					logic_;
-	GameLogic::ChessPieceType	chess_type_;
-	int							action_read_pos_;
+	SingleLogic*	logic_;
+	FChessPieceType	chess_type_;
+	int				action_read_pos_;
 };
 
 #endif
