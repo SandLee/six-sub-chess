@@ -106,9 +106,19 @@ public:
 	virtual void ready() = 0;
 
 	/**
+	 * 获取上方玩家棋子类型
+	 */
+	virtual FChessPieceType get_upperplayer_chesspiece_type() const = 0;
+
+	/**
+	* 获取下方玩家棋子类型
+	*/
+	virtual FChessPieceType get_belowplayer_chesspiece_type() const = 0;
+
+	/**
 	 * 移动棋子
 	 */
-	virtual void move_chess_piece(const FVec2 &source, const FVec2 &target) = 0;
+	virtual void move_chesspiece(const FVec2 &source, const FVec2 &target) = 0;
 
 public:
 	/**
@@ -144,7 +154,7 @@ public:
 	/**
 	 * 棋子是否有效
 	 */
-	bool is_valid_chess_piece(const FVec2 &pos) const;
+	bool is_valid_chesspiece(const FVec2 &pos) const;
 
 	/**
 	 * 获取棋子类型

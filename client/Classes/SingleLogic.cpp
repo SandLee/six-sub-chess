@@ -41,13 +41,26 @@ void SingleLogic::ready()
 	FChessArray checkerboard;
 	InitCheckerboard(checkerboard);
 	set_checkerboard(checkerboard);
+	upperplayer_ = rand() % 2 == 0 ? FChessPieceType::WHITE : FChessPieceType::BLACK;
 	add_action(FActionType::BEREADY, get_standby_chesspiece_type(), FVec2::invalid(), FVec2::invalid());
 	add_action(FActionType::START, get_standby_chesspiece_type(), FVec2::invalid(), FVec2::invalid());
 	add_action(FActionType::STANDBY, get_standby_chesspiece_type(), FVec2::invalid(), FVec2::invalid());
 }
 
+// 获取上方玩家棋子类型
+FChessPieceType SingleLogic::get_upperplayer_chesspiece_type() const
+{
+	return upperplayer_;
+}
+
+// 获取下方玩家棋子类型
+FChessPieceType SingleLogic::get_belowplayer_chesspiece_type() const
+{
+	return upperplayer_ == FChessPieceType::WHITE ? FChessPieceType::BLACK : FChessPieceType::WHITE;
+}
+
 // 移动棋子
-void SingleLogic::move_chess_piece(const FVec2 &source, const FVec2 &target)
+void SingleLogic::move_chesspiece(const FVec2 &source, const FVec2 &target)
 {
 	FMoveTrack track = { source, target };
 	add_move_track(track);

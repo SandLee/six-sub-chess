@@ -64,7 +64,7 @@ private:
 	}
 
 	// 棋子是否有效
-	bool is_valid_chess_piece(const FChessArray &checkerboard, const FVec2 &pos) const
+	bool is_valid_chesspiece(const FChessArray &checkerboard, const FVec2 &pos) const
 	{
 		return is_in_checkerboard(pos) && checkerboard[pos.y  * kCheckerboardRowNum + pos.x] != FChessPieceType::NONE;
 	}

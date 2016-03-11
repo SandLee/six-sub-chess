@@ -117,7 +117,7 @@ bool LogicBase::is_in_checkerboard(const FVec2 &pos) const
 }
 
 // 棋子是否有效
-bool LogicBase::is_valid_chess_piece(const FVec2 &pos) const
+bool LogicBase::is_valid_chesspiece(const FVec2 &pos) const
 {
 	return is_in_checkerboard(pos) && checkerboard_[pos.y  * kCheckerboardRowNum + pos.x] != FChessPieceType::NONE;
 }
@@ -125,7 +125,7 @@ bool LogicBase::is_valid_chess_piece(const FVec2 &pos) const
 // 获取棋子类型
 FChessPieceType LogicBase::get_chesspiece_type(const FVec2 &pos) const
 {
-	return is_valid_chess_piece(pos) ? checkerboard_[pos.y  * kCheckerboardRowNum + pos.x] : FChessPieceType::NONE;
+	return is_valid_chesspiece(pos) ? checkerboard_[pos.y  * kCheckerboardRowNum + pos.x] : FChessPieceType::NONE;
 }
 
 // 获取待机棋子类型
@@ -156,12 +156,12 @@ std::vector<FMoveTrack> LogicBase::get_all_movetrack(FChessPieceType type) const
 			{
 				FVec2 v1(col + i, row);
 				FVec2 v2(col, row + i);
-				if (is_in_checkerboard(v1) && !is_valid_chess_piece(v1))
+				if (is_in_checkerboard(v1) && !is_valid_chesspiece(v1))
 				{
 					FMoveTrack track = { FVec2(col, row), v1 };
 					track_array.push_back(track);
 				}
-				if (is_in_checkerboard(v2) && !is_valid_chess_piece(v2))
+				if (is_in_checkerboard(v2) && !is_valid_chesspiece(v2))
 				{
 					FMoveTrack track = { FVec2(col, row), v2 };
 					track_array.push_back(track);
@@ -181,7 +181,7 @@ void LogicBase::update(float dt)
 		const FVec2 &source = move_queue_.front().source;
 		const FVec2 &target = move_queue_.front().target;
 
-		if (source != target && is_valid_chess_piece(source) && !is_valid_chess_piece(target)
+		if (source != target && is_valid_chesspiece(source) && !is_valid_chesspiece(target)
 			&& is_adjacent(source, target) && checkerboard_[target.y  * kCheckerboardRowNum + target.x] != standby_chess_type_)
 		{
 			// 交换数据

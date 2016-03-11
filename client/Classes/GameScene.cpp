@@ -115,16 +115,8 @@ void GameScene::onBeReady()
 	FAction action = logic_->get_action_from_queue(logic_->get_action_num() - 1);
 	if (action.type == FActionType::BEREADY)
 	{
-		if ((rand() % 2) == 0)
-		{
-			robot_->reset(FChessPieceType::WHITE);
-			checkerboard_->reset(FChessPieceType::BLACK);
-		}
-		else
-		{
-			robot_->reset(FChessPieceType::BLACK);
-			checkerboard_->reset(FChessPieceType::WHITE);
-		}
+		robot_->reset(logic_->get_upperplayer_chesspiece_type());
+		checkerboard_->reset(logic_->get_belowplayer_chesspiece_type());
 	}	
 }
 

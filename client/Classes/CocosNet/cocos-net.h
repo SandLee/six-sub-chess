@@ -38,10 +38,10 @@ class NetDelegate;
 
 NS_CC_END
 
-#include "Buffer.h"
-#include "InetAddress.h"
-#include "Socket.h"
-#include "NetDelegate.h"
+#include "CCBuffer.h"
+#include "CCInetAddress.h"
+#include "CCSocket.h"
+#include "CCNetDelegate.h"
 
 
 #endif //__CCNET_H__

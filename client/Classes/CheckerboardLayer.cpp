@@ -194,28 +194,28 @@ void CheckerboardLayer::refresh_checkerboard()
 	{
 		if (value != 0)
 		{
-			Sprite *chess_piece = nullptr;
+			Sprite *chesspiece = nullptr;
 			if (free_sprite_.empty())
 			{
-				chess_piece = Sprite::create(value == 1 ? "whiteplay.png" : "blackplay.png");
-				chess_piece->setScale(Director::getInstance()->getContentScaleFactor());
-				addChild(chess_piece);
+				chesspiece = Sprite::create(value == 1 ? "whiteplay.png" : "blackplay.png");
+				chesspiece->setScale(Director::getInstance()->getContentScaleFactor());
+				addChild(chesspiece);
 			}
 			else
 			{
-				chess_piece = free_sprite_.back();
+				chesspiece = free_sprite_.back();
 				free_sprite_.pop_back();
 				Texture2D *texture = Director::getInstance()->getTextureCache()->addImage(value == 1 ? "whiteplay.png" : "blackplay.png");
-				chess_piece->setTexture(texture);
-				chess_piece->setTextureRect(Rect(0, 0, texture->getContentSize().width, texture->getContentSize().height));
-				chess_piece->setVisible(true);
-				chess_piece->setOpacity(255);
+				chesspiece->setTexture(texture);
+				chesspiece->setTextureRect(Rect(0, 0, texture->getContentSize().width, texture->getContentSize().height));
+				chesspiece->setVisible(true);
+				chesspiece->setOpacity(255);
 			}
-			chess_piece->setPosition(convert_to_world_space(ToCocos2DVec2(pos)));
-			chess_piece->setLocalZOrder(kNormalChessPieceZOrder);
+			chesspiece->setPosition(convert_to_world_space(ToCocos2DVec2(pos)));
+			chesspiece->setLocalZOrder(kNormalChessPieceZOrder);
 			int index = pos.y * kCheckerboardColNum + pos.x;
 			assert(chesspiece_sprite_[index] == nullptr);
-			chesspiece_sprite_[index] = chess_piece;
+			chesspiece_sprite_[index] = chesspiece;
 		}
 	});
 }
@@ -223,12 +223,12 @@ void CheckerboardLayer::refresh_checkerboard()
 // 移动棋子
 void CheckerboardLayer::on_move_chesspiece(const Vec2 &source, const Vec2 &target)
 {
-	Sprite *chess_piece = get_chesspiece_sprite(source);
-	assert(chess_piece != nullptr);
-	if (chess_piece != nullptr)
+	Sprite *chesspiece = get_chesspiece_sprite(source);
+	assert(chesspiece != nullptr);
+	if (chesspiece != nullptr)
 	{
 		Vec2 world_pos = convert_to_world_space(target);
-		chess_piece->runAction(Sequence::create(
+		chesspiece->runAction(Sequence::create(
 			MoveTo::create(0.1f, world_pos),
 			CallFunc::create([=]()
 		{
@@ -244,11 +244,11 @@ void CheckerboardLayer::on_move_chesspiece(const Vec2 &source, const Vec2 &targe
 // 吃掉棋子
 void CheckerboardLayer::on_kill_chesspiece(const Vec2 &source, const Vec2 &target)
 {
-	Sprite *chess_piece = get_chesspiece_sprite(target);
-	assert(chess_piece != nullptr);
-	if (chess_piece != nullptr)
+	Sprite *chesspiece = get_chesspiece_sprite(target);
+	assert(chesspiece != nullptr);
+	if (chesspiece != nullptr)
 	{
-		chess_piece->runAction(Sequence::create(
+		chesspiece->runAction(Sequence::create(
 			FadeOut::create(0.5f),
 			CallFunc::create([=]()
 		{
@@ -377,11 +377,11 @@ void CheckerboardLayer::onTouchEnded(Touch *touch, Event *unused_event)
 		auto target = convert_to_checkerboard_space(touch->getLocation());
 
 		if (logic_->is_adjacent(ToCheckerboardVec2(source), ToCheckerboardVec2(target)) &&
-			!logic_->is_valid_chess_piece(ToCheckerboardVec2(target)) &&
+			!logic_->is_valid_chesspiece(ToCheckerboardVec2(target)) &&
 			!operation_lock_)
 		{
 			selected_chesspiece_->setPosition(convert_to_world_space(target));
-			logic_->move_chess_piece(ToCheckerboardVec2(source), ToCheckerboardVec2(target));
+			logic_->move_chesspiece(ToCheckerboardVec2(source), ToCheckerboardVec2(target));
 
 			int s_index = source.y * kCheckerboardColNum + source.x;
 			int t_index = target.y * kCheckerboardColNum + target.x;

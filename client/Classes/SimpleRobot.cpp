@@ -42,12 +42,12 @@ std::vector<FMoveTrack> SimpleRobot::get_all_movetrack(const FChessArray &checke
 			{
 				FVec2 v1(col + i, row);
 				FVec2 v2(col, row + i);
-				if (is_in_checkerboard(v1) && !is_valid_chess_piece(checkerboard, v1))
+				if (is_in_checkerboard(v1) && !is_valid_chesspiece(checkerboard, v1))
 				{
 					FMoveTrack track = { FVec2(col, row), v1 };
 					track_array.push_back(track);
 				}
-				if (is_in_checkerboard(v2) && !is_valid_chess_piece(checkerboard, v2))
+				if (is_in_checkerboard(v2) && !is_valid_chesspiece(checkerboard, v2))
 				{
 					FMoveTrack track = { FVec2(col, row), v2 };
 					track_array.push_back(track);
@@ -149,7 +149,7 @@ void SimpleRobot::run_action()
 				// 优先杀死对方棋子，其次躲避对方
 				if (!kill_chess_array.empty())
 				{
-					logic_->move_chess_piece(kill_chess_array.front().source, kill_chess_array.front().target);
+					logic_->move_chesspiece(kill_chess_array.front().source, kill_chess_array.front().target);
 				}
 				else
 				{
@@ -159,14 +159,14 @@ void SimpleRobot::run_action()
 						std::default_random_engine generator(time(nullptr));
 						std::uniform_int_distribution<int> dis(0, track_array.size() - 1);
 						const FMoveTrack &track = track_array[dis(generator)];
-						logic_->move_chess_piece(track.source, track.target);
+						logic_->move_chesspiece(track.source, track.target);
 					}
 					else
 					{
 						std::default_random_engine generator(time(nullptr));
 						std::uniform_int_distribution<int> dis(0, avoid_chess_array.size() - 1);
 						const FMoveTrack &track = avoid_chess_array[dis(generator)];
-						logic_->move_chess_piece(track.source, track.target);
+						logic_->move_chesspiece(track.source, track.target);
 					}
 				}
 			}
