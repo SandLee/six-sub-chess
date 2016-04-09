@@ -11,6 +11,3 @@ Visual Studio 2015
 # 游戏截图
 ![](https://raw.githubusercontent.com/zhangpanyi/six-sub-chess/master/screenshot/1.png)
 ![](https://raw.githubusercontent.com/zhangpanyi/six-sub-chess/master/screenshot/2.png)
-
-# 详细介绍
-[http://igameday.com/2015/12/08/4.html](http://igameday.com/2015/12/08/4.html)
